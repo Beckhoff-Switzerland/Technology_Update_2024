@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="PRG_ProcessCellSimulation" Id="{c2a13f8d-2794-4486-b5dd-3ad3830b6f94}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_ProcessCellSimulation]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbMachine.Update();]]></ST>
+    </Implementation>
+    <LineIds Name="PRG_ProcessCellSimulation">
+      <LineId Id="240" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

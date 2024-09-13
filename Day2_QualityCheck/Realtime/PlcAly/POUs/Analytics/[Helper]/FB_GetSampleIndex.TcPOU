@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_GetSampleIndex" Id="ed3fef08-8e37-4252-b952-a806383cbb9a" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_GetSampleIndex
+VAR_INPUT
+	nSample: UDINT;
+	nOverSamplingFactor: UDINT;
+	nMaxOverSampling: UDINT;
+	nTimestamp: ULINT;
+END_VAR
+VAR_OUTPUT
+	bNewIndex: BOOL;
+	nIndex: UDINT;
+END_VAR
+VAR
+	nIndexFactor: UDINT;
+	nLastIndex: UDINT;
+	nLastTimestamp: ULINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+nIndex:= 1;
+
+IF nOverSamplingFactor > 0 THEN
+	nIndexFactor:= nMaxOverSampling / nOverSamplingFactor;
+
+	IF nIndexFactor > 0 THEN
+		nIndex:= (nSample - 1) / nIndexFactor;
+		nIndex:= nIndex + 1;
+	END_IF
+
+	IF nIndex > nOverSamplingFactor THEN
+		nIndex:= nOverSamplingFactor;
+	END_IF
+END_IF
+
+bNewIndex:= nIndex <> nLastIndex OR nLastTimestamp <> nTimestamp;
+
+nLastIndex:= nIndex;
+nLastTimestamp:= nTimestamp;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

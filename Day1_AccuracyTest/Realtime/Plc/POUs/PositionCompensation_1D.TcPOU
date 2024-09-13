@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="PositionCompensation_1D" Id="{97ebe876-3fd3-44c3-a7a3-ee90ca6bf279}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PositionCompensation_1D
+VAR_IN_OUT
+	afCompensationTableForward 	: ARRAY[*] OF LREAL;	 // Compensation table (measured differences between actual pos and set pos) in NC unit
+	afCompensationTableBackward : ARRAY[*] OF LREAL;	 // Compensation table (measured differences between actual pos and set pos) in NC unit
+END_VAR
+VAR_INPUT
+	fbAxis											: REFERENCE TO AXIS_REF;	// NC axis to be compensated
+	fStartPosition									: LREAL;					// First position where compensation is used in NC unit
+	fStopPosition									: LREAL;					// Last position where compensation is used in NC unit
+	bEnable											: BOOL;						// TRUE : position is compensated, FALSE : position is not compensated 
+	fBacklashValue									: LREAL		:= 0;			// Backlash value to compensate when moving backwards in NC unit 
+	fSpeedThresholdForMovementDirectionDetection	: LREAL := 0.05	;			// Threshold to detect a movement direction based on the speed in NC unit
+END_VAR
+VAR
+	bInitDone			: BOOL := FALSE;
+	nActualNbPoints		: UINT;									// How many points of the table are actually used including start and stop positions
+	fActualPos 			: LREAL;
+	fRemainder 			: LREAL;
+	nCurrentIndex 		: UINT;
+	fIndex				: LREAL;
+	fCorrectionValue 	: LREAL;
+	bMovingForward		: BOOL;
+	fCorrectionBacklash : LREAL	:= 0;
+	fbPosCorrection 	: MC_PositionCorrectionLimiter;
+	fbReadParam			: MC_ReadParameter;
+	fbWriteParam		: MC_WriteBoolParameter;
+	fMaxAcceleration 	: LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Use the rest of the code only if Enable is on
+IF NOT bEnable THEN
+	RETURN;
+END_IF
+
+// Check input validity 
+IF NOT CheckInputsAreValid() THEN
+	RETURN;
+END_IF 
+
+// Check if initialization must be done
+IF NOT bInitDone THEN
+	Init();
+END_IF
+
+// Compute the position correction
+ComputeCorrection();
+ComputeBacklash();
+
+fbAxis.ReadStatus();
+
+// Assign the corrections to the NC axis
+fbPosCorrection(
+	Axis:= fbAxis, 
+	Enable:= TRUE, 
+	PositionCorrectionValue:= fCorrectionValue + fCorrectionBacklash, 
+	CorrectionMode:= E_AxisPositionCorrectionMode.POSITIONCORRECTION_MODE_FAST, 
+	Acceleration:= fMaxAcceleration);]]></ST>
+    </Implementation>
+    <Method Name="CheckInputsAreValid" Id="{04fd6f61-fa61-4fd6-8c18-701a0727a292}">
+      <Declaration><![CDATA[METHOD CheckInputsAreValid : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* This method returns true if the inputs are valid *)
+CheckInputsAreValid := FALSE;
+
+IF  LOWER_BOUND(afCompensationTableForward,1) = LOWER_BOUND(afCompensationTableBackward,1) // check tables correspond
+	AND_THEN UPPER_BOUND(afCompensationTableForward,1) = UPPER_BOUND(afCompensationTableBackward,1)
+	AND fStartPosition < fStopPosition	// Make sure the direction of the points is positive	
+	AND __ISVALIDREF(fbAxis) // Reference to the NC axis is valid
+	THEN
+		CheckInputsAreValid := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ComputeBacklash" Id="{d20e1b7f-5b25-4e4e-b553-6e8ce7ca7384}">
+      <Declaration><![CDATA[METHOD ComputeBacklash : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* Correct the backlash depending on the movement direction *)
+IF ABS(fbAxis.NcToPlc.ActVelo) > fSpeedThresholdForMovementDirectionDetection THEN // avoid toggling at standstill
+	IF fbAxis.NcToPlc.ActVelo < 0 THEN					// compensate if the movement is backward
+		fCorrectionBacklash := fBacklashValue;
+		bMovingForward	:= FALSE;
+	ELSE
+		fCorrectionBacklash := 0;
+		bMovingForward	:= TRUE;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ComputeCorrection" Id="{4eeb0b27-a4bd-4619-8913-4709dc02d82f}">
+      <Declaration><![CDATA[METHOD ComputeCorrection : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* Reset the flag *)
+ComputeCorrection := FALSE;
+
+(* Correction of the axis based on the table (linear interpolation) *)
+fActualPos := fbAxis.NcToPlc.SetPos; // get the current position
+IF fActualPos > fStartPosition AND fActualPos < fStopPosition THEN // make sure we are inside the boundaries
+	
+	fIndex := 1 + (((fActualPos-fStartPosition)/(fStopPosition-fStartPosition)) * (nActualNbPoints-1));	// Index with fraction
+	fRemainder := FRAC(fIndex);						// normalized distance from last index
+	nCurrentIndex := LREAL_TO_UINT(FLOOR(fIndex));	// current table index
+	
+	// compute the correction value and add it to the full correction
+	IF bMovingForward THEN
+		fCorrectionValue := (afCompensationTableForward[nCurrentIndex+1] - afCompensationTableForward[nCurrentIndex]) * fRemainder + afCompensationTableForward[nCurrentIndex] ;
+	ELSE
+		fCorrectionValue := (afCompensationTableBackward[nCurrentIndex+1] - afCompensationTableBackward[nCurrentIndex]) * fRemainder + afCompensationTableBackward[nCurrentIndex] ;
+	END_IF
+END_IF
+
+
+// Computation is done
+ComputeCorrection := TRUE; 	]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{ee42b9e9-5bcd-4230-8899-776e93803dc6}">
+      <Declaration><![CDATA[METHOD PRIVATE Init : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Read the maximum acceleration in the axis parameters
+fbReadParam(
+	Axis:= fbAxis, 
+	Enable:= TRUE, 
+	ParameterNumber:= MC_AxisParameter.AxisMaximumAcceleration, 
+	ReadMode:= E_ReadMode.READMODE_ONCE, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fMaxAcceleration);
+
+// Make sure the "Enable Position Correction" parameter is TRUE	
+fbWriteParam(
+	Axis:= fbAxis, 
+	Execute:= TRUE, 
+	ParameterNumber:= MC_AxisParameter.AxisEnablePosCorrection, 
+	Value:= TRUE, 
+	Done=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> );
+	
+//Get the array size
+nActualNbPoints := DINT_TO_UINT(UPPER_BOUND(afCompensationTableForward,1) - LOWER_BOUND(afCompensationTableForward,1))+1;
+
+//  If successfully intialized, set flag to true
+IF fbWriteParam.Done AND NOT fbReadParam.Busy THEN
+	bInitDone := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="PositionCompensation_1D">
+      <LineId Id="762" Count="26" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="PositionCompensation_1D.CheckInputsAreValid">
+      <LineId Id="16" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="9" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="PositionCompensation_1D.ComputeBacklash">
+      <LineId Id="7" Count="3" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="11" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="PositionCompensation_1D.ComputeCorrection">
+      <LineId Id="62" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="72" Count="2" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="18" Count="0" />
+    </LineIds>
+    <LineIds Name="PositionCompensation_1D.Init">
+      <LineId Id="41" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="8" Count="9" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="18" Count="8" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="51" Count="2" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="30" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <GVL Name="Debug" Id="{0af3c70c-c233-48a1-8906-a353e39b9052}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	tDebug : T_DCTIME64;
+	tDebug2 : T_DCTIME64;
+	tNow : T_DCTIME64;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_ANY_Negation" Id="1f3ba0e8-ad73-433e-89e0-c99597443686" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_ANY_Negation : BOOL
+VAR_INPUT
+	Input: ANY;
+END_VAR
+VAR
+	bReturn: BOOL;
+	pREAL: POINTER TO REAL;
+	pLREAL: POINTER TO LREAL;
+	pBOOL: POINTER TO BOOL;
+	pBYTE: POINTER TO BYTE;
+	pINT: POINTER TO INT;
+	pDINT: POINTER TO DINT;
+	pLINT: POINTER TO LINT;
+	pUINT: POINTER TO UINT;
+	pUDINT: POINTER TO UDINT;
+	pULINT: POINTER TO ULINT;
+	pWORD: POINTER TO WORD;
+	pDWORD: POINTER TO DWORD;
+	pLWORD: POINTER TO LWORD;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF input.pValue <> 0 THEN
+	bReturn:= TRUE;
+
+	CASE Input.TypeClass OF
+		__SYSTEM.TYPE_CLASS.TYPE_REAL:
+			pREAL:= input.pValue;
+			pREAL^:= pREAL^ * -1;
+		__SYSTEM.TYPE_CLASS.TYPE_LREAL:
+			pLREAL:= input.pValue;
+			pLREAL^:= pLREAL^ * -1;
+		__SYSTEM.TYPE_CLASS.TYPE_BOOL:
+			pBOOL:= input.pValue;
+			pBOOL^:= NOT pBOOL^;
+		__SYSTEM.TYPE_CLASS.TYPE_BYTE:
+			pBYTE:= input.pValue;
+			pBYTE^:= NOT pBYTE^;
+		__SYSTEM.TYPE_CLASS.TYPE_INT:
+			pINT:= input.pValue;
+			pINT^:= pINT^ * -1;
+		__SYSTEM.TYPE_CLASS.TYPE_DINT:
+			pDINT:= input.pValue;
+			pDINT^:= pDINT^ * -1;
+		__SYSTEM.TYPE_CLASS.TYPE_LINT:
+			pLINT:= input.pValue;
+			pLINT^:= pLINT^ * -1;
+		__SYSTEM.TYPE_CLASS.TYPE_UINT:
+			pUINT:= input.pValue;
+			pUINT^:= NOT pUINT^;
+		__SYSTEM.TYPE_CLASS.TYPE_UDINT:
+			pUDINT:= input.pValue;
+			pUDINT^:= NOT pUDINT^;
+		__SYSTEM.TYPE_CLASS.TYPE_ULINT:
+			pULINT:= input.pValue;
+			pULINT^:= NOT pULINT^;
+		__SYSTEM.TYPE_CLASS.TYPE_WORD:
+			pWORD:= input.pValue;
+			pWORD^:= NOT pWORD^;
+		__SYSTEM.TYPE_CLASS.TYPE_DWORD:
+			pDWORD:= input.pValue;
+			pDWORD^:= NOT pDWORD^;
+		__SYSTEM.TYPE_CLASS.TYPE_LWORD:
+			pLWORD:= input.pValue;
+			pLWORD^:= NOT pLWORD^;
+		ELSE
+			bReturn:= FALSE;
+	END_CASE
+END_IF
+
+F_ANY_Negation:= bReturn;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

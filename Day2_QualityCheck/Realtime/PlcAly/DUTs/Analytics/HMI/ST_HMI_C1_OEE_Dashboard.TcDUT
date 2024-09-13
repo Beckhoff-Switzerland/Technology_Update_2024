@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_C1_OEE_Dashboard" Id="a339303d-7f27-4e26-8a89-58f693a49a98">
+    <Declaration><![CDATA[TYPE ST_HMI_C1_OEE_Dashboard : 
+STRUCT
+	stHMI_C1_Ctrl3_State_Unit: ST_HMI_C1_Ctrl3_State_Unit;
+	
+	stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE: ST_HMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE;
+	
+	stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration: ST_HMI_C1_Ctrl2_Machine_Learning_Calculation_Duration;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

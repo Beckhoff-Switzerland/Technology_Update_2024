@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_N1_M7_MachineLearningCalculationDuration" Id="5b5a745d-a1a5-4c41-9380-887028bbf019" SpecialFunc="None">
+    <Declaration><![CDATA[//The Min Max Avg 1Ch calculates minimum, maximum and average values of the input values from the beginning of the analysis up to the current moment. Furthermore the time values of the minimum and maximum are shown. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+FUNCTION_BLOCK FB_N1_M7_MachineLearningCalculationDuration
+VAR_INPUT
+	nDataIn: UDINT; 
+	tTimestamp: ULINT; 
+	bEnableExecution: BOOL := TRUE; 
+	bReset: BOOL; 
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+	bNewResult: BOOL;
+	fMin: LREAL;
+	fMax: LREAL;
+	fAvg: LREAL;
+	fbTimeMin: FB_ALY_DateTime;
+	fbTimeMax: FB_ALY_DateTime;
+END_VAR
+VAR
+	
+	
+	fbALY_MinMaxAvg_1Ch: FB_ALY_MinMaxAvg_1Ch;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="1b9732c0-5abc-4629-b804-4484a361f606">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	nCurrentContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bReset THEN
+	Reset();
+END_IF
+
+IF bEnableExecution THEN
+	IF F_HasContext(nCurrentContext, nContext) THEN
+		fbALY_MinMaxAvg_1Ch.SetChannelValue(Input:= nDataIn);
+
+		fbALY_MinMaxAvg_1Ch.Call(tTimestamp:= tTimestamp);
+
+		bNewResult:= fbALY_MinMaxAvg_1Ch.bNewResult;
+		fMin:= fbALY_MinMaxAvg_1Ch.fMin;
+		fMax:= fbALY_MinMaxAvg_1Ch.fMax;
+		fAvg:= fbALY_MinMaxAvg_1Ch.fAvg;
+		fbTimeMin:= fbALY_MinMaxAvg_1Ch.fbTimeMin;
+		fbTimeMax:= fbALY_MinMaxAvg_1Ch.fbTimeMax;
+
+		bError:= fbALY_MinMaxAvg_1Ch.bError;
+		ipTcResult:= fbALY_MinMaxAvg_1Ch.ipResultMessage;
+	END_IF
+ELSE
+	bNewResult:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="7f4366d5-2586-45c1-9cea-d3ecb5de7b5c">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Reset:= fbALY_MinMaxAvg_1Ch.Reset();
+
+bNewResult:= fbALY_MinMaxAvg_1Ch.bNewResult;
+fMin:= fbALY_MinMaxAvg_1Ch.fMin;
+fMax:= fbALY_MinMaxAvg_1Ch.fMax;
+fAvg:= fbALY_MinMaxAvg_1Ch.fAvg;
+fbTimeMin:= fbALY_MinMaxAvg_1Ch.fbTimeMin;
+fbTimeMax:= fbALY_MinMaxAvg_1Ch.fbTimeMax;
+
+bError:= NOT Reset;
+ipTcResult:= fbALY_MinMaxAvg_1Ch.ipResultMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetHMI" Id="5664163c-fd7d-4f55-89c7-0f593a9569da">
+      <Declaration><![CDATA[METHOD SetHMI : BOOL
+VAR_INPUT
+	nContent: DINT;
+	pContent: PVOID;
+	bHMIReinit: BOOL;
+END_VAR
+VAR
+	pHMI_C1_OEE_Dashboard: POINTER TO ST_HMI_C1_OEE_Dashboard;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SetHMI:= FALSE;
+
+CASE nContent OF
+	1:
+		pHMI_C1_OEE_Dashboard:= pContent;
+
+
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.nM7_nDataIn:= nDataIn;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.fM7_fMin:= fMin;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.fM7_fMax:= fMax;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.fM7_fAvg:= fAvg;
+		fbTimeMin.nUtcTimeBias:= -120; //UTC Offset [(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna]
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.tM7_fbTimeMin:= fbTimeMin.stStructured;
+		fbTimeMax.nUtcTimeBias:= -120; //UTC Offset [(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna]
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.tM7_fbTimeMax:= fbTimeMax.stStructured;
+END_CASE
+
+SetHMI:= TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetHMI" Id="84a38120-42ab-4286-bda3-0a04007e9bf4">
+      <Declaration><![CDATA[METHOD GetHMI : BOOL
+VAR_INPUT
+	nContent: DINT;
+	pContent: PVOID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="403d189e-aefe-4659-b515-ef665f20ecfa">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="559bedd4-c8de-4fd0-bb7e-8b57f611ce72">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= E_VirtualInput.eContext_V1_Virtual_Input_Source;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

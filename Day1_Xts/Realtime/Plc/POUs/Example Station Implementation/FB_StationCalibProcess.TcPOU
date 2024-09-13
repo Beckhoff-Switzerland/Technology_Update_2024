@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_StationCalibProcess" Id="{a5fc0330-11c8-444d-9faf-e463108898c0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_StationCalibProcess EXTENDS FB_StationBase
+VAR
+	fbTonSettling : TON;
+	fbRandomValue : DRAND;
+	aPosCorrLim : ARRAY[1..MAIN.N_NBR_MOVERS] OF TC2_MC2.MC_PositionCorrectionLimiter;
+	
+	nDist AT%I*: UINT;
+//	aBuffer : ARRAY[1..1000] OF UINT;
+	nCnt : INT;
+//	iAvg : UDINT;
+	nAfterCalibration : UINT;
+	
+	bInitDone : BOOL;
+	fbMovingAvg : FB_CTRL_MOVING_AVERAGE;
+	stParams : ST_CTRL_MOVING_AVERAGE_PARAMS;
+	aData : ARRAY[0..100] OF LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Initialize" Id="{fe9ac0d5-427d-4625-99df-ad08796e0f71}">
+      <Declaration><![CDATA[METHOD Initialize : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stParams.nSamplesToFilter := 100;
+stParams.nWorkArray_SIZEOF := SIZEOF(aData);
+stParams.pWorkArray_ADR := ADR(aData);
+stParams.tCtrlCycleTime := UDINT_TO_TIME(_TaskInfo[GETCURTASKINDEXEX()].CycleTime)/10000;
+stParams.tTaskCycleTime := UDINT_TO_TIME(_TaskInfo[GETCURTASKINDEXEX()].CycleTime)/10000;
+
+fbMovingAvg.eMode := E_CTRL_MODE.eCTRL_MODE_ACTIVE;
+fbMovingAvg(stParams := stParams);
+
+Initialize := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Update" Id="{1d6e6bc8-c8ba-4e5c-b5ce-40fb596d427c}">
+      <Declaration><![CDATA[METHOD Update
+VAR_INPUT
+	iStation : I_XTS_Station_PLC;
+END_VAR
+VAR
+	iMoverTemp : I_XTS_Mover;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bInitDone = FALSE THEN
+	bInitDone := Initialize();
+END_IF
+
+SUPER^.Update(iStation := iStation);
+
+CASE nState OF
+	E_StationProcessState.Idle:
+		;
+		
+	E_StationProcessState.ProcessStart:
+		fbTonSettling.IN := TRUE;
+		IF fbTonSettling.Q THEN
+			fbTonSettling.IN := FALSE;
+			nState := E_StationProcessState.ProcessBusy;
+		END_IF
+
+		
+	E_StationProcessState.ProcessBusy:
+		// get Mover
+		IF __QUERYINTERFACE(MAIN.iXtsSystem.Station('Calibration').MoversInQueue[0], iMoverTemp) THEN
+			aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId](
+				Axis:= iMoverTemp.getAxisRef,  
+				CorrectionMode:= E_AxisPositionCorrectionMode.POSITIONCORRECTION_MODE_FAST, 
+				Acceleration:= 1000);	
+		END_IF
+
+
+		CASE nStep OF 
+			0: // reset to 0 if active correction
+				IF aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Busy THEN
+					aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].PositionCorrectionValue := 0;
+					aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Enable := TRUE;
+					IF aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Busy AND aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Limiting OR aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].PositionCorrectionValue <= 0.1 THEN
+						nStep:= nStep + 1;
+					END_IF
+				ELSE
+					nStep:= nStep + 1;
+				END_IF
+
+			1: // wait for correction is set to 0
+				IF aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Limiting =FALSE THEN
+					nCnt := 1;
+					nStep:= nStep + 1;
+				END_IF
+
+			2: // wait for setteling
+				fbTonSettling.IN := TRUE;
+				fbMovingAvg.eMode := e_Ctrl_Mode.eCTRL_MODE_RESET;
+				IF fbTonSettling.Q THEN
+					fbTonSettling.IN := FALSE;
+					nStep:= nStep + 1;
+				END_IF
+				
+			3: // Set Mode to Active
+				fbMovingAvg.eMode := e_Ctrl_Mode.eCTRL_MODE_ACTIVE;
+				IF fbMovingAvg.eState = E_CTRL_STATE.eCTRL_STATE_ACTIVE THEN
+					nStep:= nStep + 1;
+				END_IF
+			
+			4:
+				{IF defined (HW_Lyssach)}
+					IF nDist >= 1000 AND nDist <=2000 THEN // validate measurement value
+						fbMovingAvg.fIn := nDist;
+					ELSE
+						fbMovingAvg.fIn := 1280;
+					END_IF
+					fbMovingAvg(stParams := stParams);
+					nCnt := nCnt + 1;
+					IF nCnt > 100 THEN
+						nStep:= nStep + 1;
+					END_IF
+				{ELSE}		
+					fbRandomValue(Seed:= UDINT_TO_INT(_TaskInfo[GETCURTASKINDEXEX()].CycleCount));
+					nStep:= nStep + 1;
+				{END_IF}
+				
+				
+			5: // set correction
+				{IF defined (HW_Lyssach)}
+					aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].PositionCorrectionValue := 128.0-fbMovingAvg.fOut/10.0;
+				{ELSE}
+					aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].PositionCorrectionValue := (fbRandomValue.Num-0.5)*20;
+				{END_IF}
+				aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Enable := TRUE;
+				IF aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Busy AND aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Limiting OR aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].PositionCorrectionValue <= 0.1 THEN
+					nStep:= nStep + 1;
+				END_IF
+				
+			6: // wait for correction done
+				fbMovingAvg.eMode := E_CTRL_MODE.eCTRL_MODE_IDLE;
+				IF aPosCorrLim[iMoverTemp.getAxisRef.DriveAddress.NcAxisId].Limiting =FALSE THEN
+					nStep:= nStep + 1;
+				END_IF
+				
+			7: // wait for setteling
+				fbTonSettling.IN := TRUE;
+				IF fbTonSettling.Q THEN
+					nAfterCalibration := nDist;
+					fbTonSettling.IN := FALSE;
+					nStep:= 0;
+					nState := E_StationProcessState.ProcessDone;
+				END_IF
+		END_CASE
+		
+	E_StationProcessState.ProcessDone:
+		main.iXtsSystem.Station('Calibration').SendMoversToStation('WaitBuffer');
+
+END_CASE
+
+fbTonSettling(PT:= T#500MS);
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_StationCalibProcess">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_StationCalibProcess.Initialize">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_StationCalibProcess.Update">
+      <LineId Id="126" Count="110" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

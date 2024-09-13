@@ -1,0 +1,737 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{81fea7da-109b-4b19-a359-7a020bfed536}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <Name>Plc</Name>
+    <ProgramVersion>3.1.0.9</ProgramVersion>
+    <Application>{907c99e2-77f1-4504-81ac-78aab142a2ab}</Application>
+    <TypeSystem>{ed283f72-f461-4354-aef8-619896305ffe}</TypeSystem>
+    <Implicit_Task_Info>{874a3b20-8350-4237-b99c-c841e2fac5a7}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{50c3097f-fddf-4b30-9261-7e6fc15cda7c}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{7ba93875-07d9-4fa4-b5c6-254eac59d725}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{13c22c92-5513-47e5-bc8f-9f357cfe98c9}</LibraryReferences>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <Company>Beckhoff Automation GmbH</Company>
+    <Released>false</Released>
+    <Title>Sample PackML_V2</Title>
+    <Author>Beckhoff Automation GmbH</Author>
+    <Description>Sample PackML_V2</Description>
+    <ProjectVersion>3.0.3.0</ProjectVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="COMPONENTs\Debug.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="COMPONENTs\E_ObservationState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\GVL_Components.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="COMPONENTs\FB_Machine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\FB_RollingAverage_Ppm.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Mode\E_PMLMode.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Mode\E_PMLStopReason.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\OEE\ST_Analytics.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\PackML\ST_PMLc_Custom.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\PackML\ST_PMLs_Custom.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\PackML\ST_PML_Custom.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Unit\FB_Unit.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Vision\E_VisionState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Vision\FB_VsSystem.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Vision\I_VsSystem_Check.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="COMPONENTs\Vision\I_VsSystem_Plc.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="THREADs\PRG_ProcessCellSimulation.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="THREADs\PRG_Vision.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VisionTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="COMPONENTs\Mode" />
+    <Folder Include="COMPONENTs\PackML" />
+    <Folder Include="COMPONENTs\OEE" />
+    <Folder Include="COMPONENTs\Vision" />
+    <Folder Include="COMPONENTs\Unit" />
+    <Folder Include="COMPONENTs" />
+    <Folder Include="THREADs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderReference Include="CHALET_BaseComponents">
+      <DefaultResolution>CHALET_BaseComponents, * (Beckhoff CH)</DefaultResolution>
+      <Namespace>CHALET_BaseComponents</Namespace>
+      <Parameters>
+        <Parameter ListName="BASEPARAMETERLIST" xmlns="">
+          <Key>MAX_OBJECTS</Key>
+          <Value>150</Value>
+        </Parameter>
+        <Parameter ListName="BASEPARAMETERLIST" xmlns="">
+          <Key>MAX_COE_READ</Key>
+          <Value>20</Value>
+        </Parameter>
+        <Parameter ListName="BASEPARAMETERLIST" xmlns="">
+          <Key>MAX_COE_WRITE</Key>
+          <Value>20</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="CHALET_Nc">
+      <DefaultResolution>CHALET_Nc, * (Beckhoff CH)</DefaultResolution>
+      <Namespace>CHALET_Nc</Namespace>
+      <Parameters>
+        <Parameter ListName="NCPARAMETERLIST" xmlns="">
+          <Key>ERROR_IF_NC_AXIS_IS_NOT_MAPPED</Key>
+          <Value>TRUE</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="CHALET_Vision">
+      <DefaultResolution>CHALET_Vision, * (Beckhoff CH)</DefaultResolution>
+      <Namespace>CHALET_Vision</Namespace>
+      <Parameters>
+        <Parameter ListName="VISIONPARAMETERLIST" xmlns="">
+          <Key>MAX_VN_REGISTER_READ</Key>
+          <Value>1</Value>
+        </Parameter>
+        <Parameter ListName="VISIONPARAMETERLIST" xmlns="">
+          <Key>MAX_VN_REGISTER_WRITE</Key>
+          <Value>1</Value>
+        </Parameter>
+        <Parameter ListName="VISIONPARAMETERLIST" xmlns="">
+          <Key>ILLUMINATION_WAIT_FOR_TRIGGER_FEEDBACK</Key>
+          <Value>FALSE</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="CHALET_XPlanar">
+      <DefaultResolution>CHALET_XPlanar, * (Beckhoff CH)</DefaultResolution>
+      <Namespace>CHALET_XPlanar</Namespace>
+      <Parameters>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>F_MOVER_MINIMUM_GAP_ON_TRACK</Key>
+          <Value>250</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>N_MAX_SEARCH_DEPTH</Key>
+          <Value>50</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>F_GAP_DEFAULT</Key>
+          <Value>250</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>F_GAP_STARTUP</Key>
+          <Value>250</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>B_ADD_ENVIROMENT_TO_GROUP</Key>
+          <Value>TRUE</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>F_DIST_SET_NEW_MOVE_CMD_BEFORE_REACHING_PARENT_STATION</Key>
+          <Value>100.0</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>N_MAX_STATIONS_AHEAD_OR_BEHIND</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>F_ENABLING_ON_TRACK_VELOCITY</Key>
+          <Value>0</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>F_ENABLING_ON_TRACK_ACC_DEC</Key>
+          <Value>0</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>B_TRACK_NAME_TACKOVER_FROM_TRACK_OBJECT</Key>
+          <Value>TRUE</Value>
+        </Parameter>
+        <Parameter ListName="XPLANARPARAMETERLIST">
+          <Key>B_AUTOMATICALLY_CREEATE_MISSING_HELPER_STATIONS</Key>
+          <Value>TRUE</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_ControllerToolbox">
+      <DefaultResolution>Tc2_ControllerToolbox, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_ControllerToolbox</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_EtherCAT">
+      <DefaultResolution>Tc2_EtherCAT, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_EtherCAT</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_MC2">
+      <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_MC2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Standard">
+      <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Standard</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_System">
+      <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_System</Namespace>
+      <Parameters>
+        <Parameter ListName="PARAM" xmlns="">
+          <Key>TABLE_UPPER_BOUND</Key>
+          <Value>15</Value>
+        </Parameter>
+        <Parameter ListName="PARAM" xmlns="">
+          <Key>STRING_LENGTH_EXP</Key>
+          <Value>255</Value>
+        </Parameter>
+        <Parameter ListName="PARAM" xmlns="">
+          <Key>STRING_LENGTH_ADDRESS</Key>
+          <Value>20</Value>
+        </Parameter>
+        <Parameter ListName="PARAM" xmlns="">
+          <Key>STRING_LENGTH_COMMENT</Key>
+          <Value>255</Value>
+        </Parameter>
+        <Parameter ListName="PARAM" xmlns="">
+          <Key>STRING_LENGTH_OUTSTRING</Key>
+          <Value>255</Value>
+        </Parameter>
+        <Parameter ListName="PARAM" xmlns="">
+          <Key>TABLE_SHOW_VALID_ITEMS</Key>
+          <Value>FALSE</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Utilities">
+      <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
+      <Parameters>
+        <Parameter ListName="PARAMETERLIST" xmlns="">
+          <Key>NMAXLICENSES</Key>
+          <Value>50</Value>
+        </Parameter>
+        <Parameter ListName="PARAMETERLIST" xmlns="">
+          <Key>NMAXLICENSEDEVICES</Key>
+          <Value>16</Value>
+        </Parameter>
+        <Parameter ListName="PARAMETERLIST" xmlns="">
+          <Key>NMAXCPUCOUNT</Key>
+          <Value>64</Value>
+        </Parameter>
+        <Parameter ListName="PARAMETERLIST" xmlns="">
+          <Key>CMAXCHARACTERS</Key>
+          <Value>16#FFFFFFF0</Value>
+        </Parameter>
+        <Parameter ListName="PARAMETERLIST" xmlns="">
+          <Key>NMAXFILESONDONGLE</Key>
+          <Value>20</Value>
+        </Parameter>
+        <Parameter ListName="PARAMETERLIST" xmlns="">
+          <Key>CMAXCSVFIELDVALUESIZE</Key>
+          <Value>255</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Mc3PlanarMotion">
+      <DefaultResolution>Tc3_Mc3PlanarMotion, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Mc3PlanarMotion</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Module">
+      <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Module</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_PackML_V2">
+      <DefaultResolution>Tc3_PackML_V2, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_PackML_V2</Namespace>
+      <Parameters>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXINTERFACEPARAMETERS</Key>
+          <Value>5</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXPRODUCTPROCESSVARIABLES</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXINGREDIENTS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXINGREDIENTPARAMETERS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXCOMMANDREMOTEINTERFACES</Key>
+          <Value>2</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXCOMMANDPARAMETERS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXCOMMANDPRODUCTS</Key>
+          <Value>5</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXSTATUSREMOTEINTERFACES</Key>
+          <Value>2</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXSTATUSPARAMETERS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXSTATUSPRODUCTS</Key>
+          <Value>5</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXADMINPARAMETERS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXALARMS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXHISTORYALARMS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXSTOPREASONS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXWARNINGS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXCONSUMEDCOUNTS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="GLOBALPARAMETERS" xmlns="">
+          <Key>MAXPRODUCTCOUNTS</Key>
+          <Value>10</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Vision">
+      <DefaultResolution>Tc3_Vision, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Vision</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_XPlanarUtility">
+      <DefaultResolution>Tc3_XPlanarUtility, * (Beckhoff Automation GmbH &amp; Co. KG)</DefaultResolution>
+      <Namespace>Tc3_XPlanarUtility</Namespace>
+      <Parameters>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXPROCESSINGUNITS</Key>
+          <Value>1</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXTILES</Key>
+          <Value>100</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXTILESPERPART</Key>
+          <Value>100</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXXPLANARMOVERSPERXPU</Key>
+          <Value>30</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXMOVERPARAMETRIZATIONSETS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXAREAS</Key>
+          <Value>5</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXPARTS</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXETHERCATMASTER</Key>
+          <Value>10</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXTRACKS</Key>
+          <Value>20</Value>
+        </Parameter>
+        <Parameter ListName="PARAM_TCIOXPLANARENVIRONMENT" xmlns="">
+          <Key>MAXGROUPS</Key>
+          <Value>10</Value>
+        </Parameter>
+      </Parameters>
+    </PlaceholderReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderResolution Include="CAA Callback">
+      <Resolution>CAA Callback Extern, 3.5.11.0 (CAA Technical Workgroup)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CAA MemBlockMan">
+      <Resolution>CAA Memory Block Manager Extern, 3.5.13.0 (CAA Technical Workgroup)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CAA ResMan">
+      <Resolution>CAA Ressource Manager Extern, 3.5.11.0 (CAA Technical Workgroup)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CAA Types">
+      <Resolution>CAA Types Extern, 3.5.13.0 (CAA Technical Workgroup)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CHALET_BaseComponents">
+      <Resolution>CHALET_BaseComponents, 3.4.6 (Beckhoff CH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CHALET_Nc">
+      <Resolution>CHALET_Nc, 3.2.1 (Beckhoff CH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CHALET_Vision">
+      <Resolution>CHALET_Vision, 3.0.1 (Beckhoff CH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CHALET_XPlanar">
+      <Resolution>CHALET_XPlanar, 4.4.9 (Beckhoff CH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpApp">
+      <Resolution>CmpApp, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpBitmapPool">
+      <Resolution>CmpBitmapPool, 3.5.7.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpDynamicText">
+      <Resolution>CmpDynamicText, 3.5.9.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpEventMgr">
+      <Resolution>CmpEventMgr, 3.5.12.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpLog">
+      <Resolution>CmpLog, 3.5.5.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpSchedule">
+      <Resolution>CmpSchedule, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpTargetVisu">
+      <Resolution>CmpTargetVisu, 3.5.5.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="CmpVisuHandler">
+      <Resolution>CmpVisuHandler, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Collections">
+      <Resolution>Collections, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Component Manager">
+      <Resolution>Component Manager, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="FloatingPointUtils">
+      <Resolution>FloatingPointUtils, 3.5.9.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Standard">
+      <Resolution>Tc2_Standard, 3.4.5.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Standard64">
+      <Resolution>Tc2_Standard, 3.4.5.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="StringUtils">
+      <Resolution>StringUtils, 3.5.13.20 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysCpuHandling">
+      <Resolution>SysCpuHandling, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysDir">
+      <Resolution>SysDir, 3.5.12.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysFile">
+      <Resolution>SysFile, 3.5.9.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysMem">
+      <Resolution>SysMem, 3.5.12.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysProcess">
+      <Resolution>SysProcess, 3.5.7.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysShm">
+      <Resolution>SysShm, 3.5.8.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysTarget">
+      <Resolution>SysTarget, 3.5.5.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuElemBase">
+      <Resolution>VisuElemBase, 3.5.13.40 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuElemMeter">
+      <Resolution>VisuElemMeter, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuElems">
+      <Resolution>VisuElems, 3.5.13.40 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuElemsSpecialControls">
+      <Resolution>VisuElemsSpecialControls, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuElemsWinControls">
+      <Resolution>VisuElemsWinControls, 3.5.13.20 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuElemTextEditor">
+      <Resolution>VisuElemTextEditor, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="system_visuinputs">
+      <Resolution>VisuInputs, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuInputs">
+      <Resolution>VisuInputs, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="System_VisuNativeControl">
+      <Resolution>VisuNativeControl, 3.5.13.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysTime">
+      <Resolution>SysTime, 3.5.9.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysTimeCore">
+      <Resolution>SysTimeCore, 3.5.5.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="SysTimeRtc">
+      <Resolution>SysTimeRtc, 3.5.5.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_ControllerToolbox">
+      <Resolution>Tc2_ControllerToolbox, 3.6.1.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Drive">
+      <Resolution>Tc2_Drive, 3.3.13.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_EtherCAT">
+      <Resolution>Tc2_EtherCAT, 3.5.1.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_IoFunctions">
+      <Resolution>Tc2_IoFunctions, 3.4.3.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Math">
+      <Resolution>Tc2_Math, 3.4.4.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_MC2">
+      <Resolution>Tc2_MC2, 3.3.63.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_MC2_Drive">
+      <Resolution>Tc2_MC2_Drive, 3.3.40.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Standard">
+      <Resolution>Tc2_Standard, 3.4.5.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_System">
+      <Resolution>Tc2_System, 3.6.4.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc2_Utilities">
+      <Resolution>Tc2_Utilities, 3.7.4.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_EventLogger">
+      <Resolution>Tc3_EventLogger, 3.3.8.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_Mc3Definitions">
+      <Resolution>Tc3_Mc3Definitions, 3.3.25.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_Mc3PlanarMotion">
+      <Resolution>Tc3_Mc3PlanarMotion, 3.3.25.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_Module">
+      <Resolution>Tc3_Module, 3.4.5.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_PackML_V2">
+      <Resolution>Tc3_PackML_V2, 3.4.2.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_Physics">
+      <Resolution>Tc3_Physics, 3.3.25.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_Vision">
+      <Resolution>Tc3_Vision, 4.0.6.0 (Beckhoff Automation GmbH)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Tc3_XPlanarUtility">
+      <Resolution>Tc3_XPlanarUtility, 3.1.2203.3 (Beckhoff Automation GmbH &amp; Co. KG)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="Util">
+      <Resolution>Util, 3.5.11.0 (System)</Resolution>
+    </PlaceholderResolution>
+    <PlaceholderResolution Include="VisuDialogs">
+      <Resolution>VisuDialogs, 3.5.12.0 (System)</Resolution>
+    </PlaceholderResolution>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Plc.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ProjectExtensions>
+    <PlcProjectOptions>
+      <XmlArchive>
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
+      <v n="Name">"&lt;ProjectRoot&gt;"</v>
+      <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+        <v>{FE9F63D4-9E34-43ce-9322-D46747A00F33}</v>
+        <o>
+          <v n="Name">"{FE9F63D4-9E34-43ce-9322-D46747A00F33}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
+        <o>
+          <v n="Name">"{8F99A816-E488-41E4-9FA3-846536012284}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
+        <o>
+          <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
+          <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+            <v>Rules</v>
+            <o>
+              <v n="Name">"Rules"</v>
+              <d n="SubKeys" t="Hashtable" />
+              <d n="Values" t="Hashtable" />
+            </o>
+          </d>
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{40450F57-0AA3-4216-96F3-5444ECB29763}</v>
+        <o>
+          <v n="Name">"{40450F57-0AA3-4216-96F3-5444ECB29763}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String" cvt="String">
+            <v>ActiveVisuProfile</v>
+            <v>IR0whWr8bwfwBwAAiD2qpQAAAABVAgAA37x72QAAAAABAAAAAAAAAAEaUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwACTHsAZgA5ADUAYgBiADQAMgA2AC0ANQA1ADIANAAtADQAYgA0ADUALQA5ADQAMAAwAC0AZgBiADAAZgAyAGUANwA3AGUANQAxAGIAfQADCE4AYQBtAGUABDBUAHcAaQBuAEMAQQBUACAAMwAuADEAIABCAHUAaQBsAGQAIAA0ADAAMgA0AC4ANwAFFlAAcgBvAGYAaQBsAGUARABhAHQAYQAGTHsAMQA2AGUANQA1AGIANgAwAC0ANwAwADQAMwAtADQAYQA2ADMALQBiADYANQBiAC0ANgAxADQANwAxADMAOAA3ADgAZAA0ADIAfQAHEkwAaQBiAHIAYQByAGkAZQBzAAhMewAzAGIAZgBkADUANAA1ADkALQBiADAANwBmAC0ANABkADYAZQAtAGEAZQAxAGEALQBhADgAMwAzADUANgBhADUANQAxADQAMgB9AAlMewA5AGMAOQA1ADgAOQA2ADgALQAyAGMAOAA1AC0ANAAxAGIAYgAtADgAOAA3ADEALQA4ADkANQBmAGYAMQBmAGUAZABlADEAYQB9AAoOVgBlAHIAcwBpAG8AbgALBmkAbgB0AAwKVQBzAGEAZwBlAA0KVABpAHQAbABlAA4aVgBpAHMAdQBFAGwAZQBtAE0AZQB0AGUAcgAPDkMAbwBtAHAAYQBuAHkAEAxTAHkAcwB0AGUAbQARElYAaQBzAHUARQBsAGUAbQBzABIwVgBpAHMAdQBFAGwAZQBtAHMAUwBwAGUAYwBpAGEAbABDAG8AbgB0AHIAbwBsAHMAEyhWAGkAcwB1AEUAbABlAG0AcwBXAGkAbgBDAG8AbgB0AHIAbwBsAHMAFCRWAGkAcwB1AEUAbABlAG0AVABlAHgAdABFAGQAaQB0AG8AcgAVIlYAaQBzAHUATgBhAHQAaQB2AGUAQwBvAG4AdAByAG8AbAAWFHYAaQBzAHUAaQBuAHAAdQB0AHMAFwxzAHkAcwB0AGUAbQAYGFYAaQBzAHUARQBsAGUAbQBCAGEAcwBlABkmRABlAHYAUABsAGEAYwBlAGgAbwBsAGQAZQByAHMAVQBzAGUAZAAaCGIAbwBvAGwAGyJQAGwAdQBnAGkAbgBDAG8AbgBzAHQAcgBhAGkAbgB0AHMAHEx7ADQAMwBkADUAMgBiAGMAZQAtADkANAAyAGMALQA0ADQAZAA3AC0AOQBlADkANAAtADEAYgBmAGQAZgAzADEAMABlADYAMwBjAH0AHRxBAHQATABlAGEAcwB0AFYAZQByAHMAaQBvAG4AHhRQAGwAdQBnAGkAbgBHAHUAaQBkAB8WUwB5AHMAdABlAG0ALgBHAHUAaQBkACBIYQBmAGMAZAA1ADQANAA2AC0ANAA5ADEANAAtADQAZgBlADcALQBiAGIANwA4AC0AOQBiAGYAZgBlAGIANwAwAGYAZAAxADcAIRRVAHAAZABhAHQAZQBJAG4AZgBvACJMewBiADAAMwAzADYANgBhADgALQBiADUAYwAwAC0ANABiADkAYQAtAGEAMAAwAGUALQBlAGIAOAA2ADAAMQAxADEAMAA0AGMAMwB9ACMOVQBwAGQAYQB0AGUAcwAkTHsAMQA4ADYAOABmAGYAYwA5AC0AZQA0AGYAYwAtADQANQAzADIALQBhAGMAMAA2AC0AMQBlADMAOQBiAGIANQA1ADcAYgA2ADkAfQAlTHsAYQA1AGIAZAA0ADgAYwAzAC0AMABkADEANwAtADQAMQBiADUALQBiADEANgA0AC0ANQBmAGMANgBhAGQAMgBiADkANgBiADcAfQAmFk8AYgBqAGUAYwB0AHMAVAB5AHAAZQAnVFUAcABkAGEAdABlAEwAYQBuAGcAdQBhAGcAZQBNAG8AZABlAGwARgBvAHIAQwBvAG4AdgBlAHIAdABpAGIAbABlAEwAaQBiAHIAYQByAGkAZQBzACgQTABpAGIAVABpAHQAbABlACkUTABpAGIAQwBvAG0AcABhAG4AeQAqHlUAcABkAGEAdABlAFAAcgBvAHYAaQBkAGUAcgBzACs4UwB5AHMAdABlAG0ALgBDAG8AbABsAGUAYwB0AGkAbwBuAHMALgBIAGEAcwBoAHQAYQBiAGwAZQAsEnYAaQBzAHUAZQBsAGUAbQBzAC1INgBjAGIAMQBjAGQAZQAxAC0AZAA1AGQAYwAtADQAYQAzAGIALQA5ADAANQA0AC0AMgAxAGYAYQA3ADUANgBhADMAZgBhADQALihJAG4AdABlAHIAZgBhAGMAZQBWAGUAcgBzAGkAbwBuAEkAbgBmAG8AL0x7AGMANgAxADEAZQA0ADAAMAAtADcAZgBiADkALQA0AGMAMwA1AC0AYgA5AGEAYwAtADQAZQAzADEANABiADUAOQA5ADYANAAzAH0AMBhNAGEAagBvAHIAVgBlAHIAcwBpAG8AbgAxGE0AaQBuAG8AcgBWAGUAcgBzAGkAbwBuADIMTABlAGcAYQBjAHkAMzBMAGEAbgBnAHUAYQBnAGUATQBvAGQAZQBsAFYAZQByAHMAaQBvAG4ASQBuAGYAbwA0MEwAbwBhAGQATABpAGIAcgBhAHIAaQBlAHMASQBuAHQAbwBQAHIAbwBqAGUAYwB0ADUaQwBvAG0AcABhAHQAaQBiAGkAbABpAHQAeQDQAAIaA9ADAS0E0AUGGgfQBwgaAUUHCQjQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtDtAPAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60BAAAA0A0BLRHQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0S0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAUAAAA0AwLrQIAAADQDQEtE9APAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAAAAAANAMC60CAAAA0A0BLRTQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0V0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtFtAPAS0X0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60EAAAA0A0BLRjQDwEtENAZGq0BRRscAdAAHBoCRR0LBAMAAAAFAAAADQAAAAAAAADQHh8tINAhIhoCRSMkAtAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAAAAANADAS0n0CgBLRHQKQEtENAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAQAAANADAS0n0CgBLRHQKQEtEJoqKwFFAAEC0AABLSzQAAEtF9AAHy0t0C4vGgPQMAutAQAAANAxC60XAAAA0DIarQDQMy8aA9AwC60CAAAA0DELrQMAAADQMhqtANA0Gq0A0DUarQA=</v>
+          </d>
+        </o>
+        <v>{A3BBA713-63D7-4de6-BEC2-E3BAAD8789F8}</v>
+        <o>
+          <v n="Name">"{A3BBA713-63D7-4de6-BEC2-E3BAAD8789F8}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{C70B7845-2722-4a9b-A0EA-88C877A4B36F}</v>
+        <o>
+          <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String">
+            <v>MaxAuthenticationTrials</v>
+            <v>3</v>
+            <v>UserList</v>
+            <o t="UserList">
+              <a n="Users" cet="User">
+                <o>
+                  <v n="Id">{a2387724-f387-4ef4-b48e-e29d97429876}</v>
+                  <v n="Name">"Owner"</v>
+                  <v n="FullName">""</v>
+                  <v n="Description">""</v>
+                  <v n="Active">true</v>
+                </o>
+              </a>
+            </o>
+            <v>MaxTimeOfInactivity</v>
+            <v>10</v>
+            <v>EnableMaxTimeOfInactivity</v>
+            <v>true</v>
+            <v>GroupList</v>
+            <o t="GroupList">
+              <a n="Groups" cet="Group">
+                <o>
+                  <v n="Id">{0022019e-e4ea-4341-ac43-390d09cd9fe1}</v>
+                  <v n="Name">"Owner"</v>
+                  <v n="Description">""</v>
+                  <v n="IsEveryoneGroup">false</v>
+                  <v n="IsOwnerGroup">true</v>
+                  <l n="UserMembers" t="ArrayList" cet="Guid">
+                    <v>a2387724-f387-4ef4-b48e-e29d97429876</v>
+                  </l>
+                  <l n="GroupMembers" t="ArrayList" />
+                </o>
+                <o>
+                  <v n="Id">{fcc9efb5-76bf-4c4f-8542-0fb9b09d752f}</v>
+                  <v n="Name">"Everyone"</v>
+                  <v n="Description">""</v>
+                  <v n="IsEveryoneGroup">true</v>
+                  <v n="IsOwnerGroup">false</v>
+                  <l n="UserMembers" t="ArrayList" cet="Guid">
+                    <v>a2387724-f387-4ef4-b48e-e29d97429876</v>
+                  </l>
+                  <l n="GroupMembers" t="ArrayList" />
+                </o>
+              </a>
+            </o>
+            <v>UserAuthentication</v>
+            <o t="UserAuthentication">
+              <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
+                <v>a2387724-f387-4ef4-b48e-e29d97429876</v>
+                <v>d41d8cd98f00b204e9800998ecf8427e</v>
+              </d>
+            </o>
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
+          </d>
+        </o>
+        <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
+        <o>
+          <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
+        <o>
+          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
+        </o>
+      </d>
+      <d n="Values" t="Hashtable" />
+    </o>
+        </Data>
+        <TypeList>
+          <Type n="ArrayList">System.Collections.ArrayList</Type>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
+          <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
+          <Type n="Guid">System.Guid</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="Int32">System.Int32</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+          <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
+          <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
+          <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
+        </TypeList>
+      </XmlArchive>
+    </PlcProjectOptions>
+  </ProjectExtensions>
+</Project>

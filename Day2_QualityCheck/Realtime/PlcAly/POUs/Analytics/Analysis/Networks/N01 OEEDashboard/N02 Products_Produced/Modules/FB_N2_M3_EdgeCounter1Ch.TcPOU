@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_N2_M3_EdgeCounter1Ch" Id="66d8a7ca-7c35-429f-8873-b2ea16f092b4" SpecialFunc="None">
+    <Declaration><![CDATA[//The Edge Counter 1Ch counts the amount of raised events. An event is raised when the signal of the input channel passes the configured edge at a specific threshold. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+FUNCTION_BLOCK FB_N2_M3_EdgeCounter1Ch
+VAR_INPUT
+	fDataIn: LREAL; 
+	tTimestamp: ULINT; 
+	bEnableExecution: BOOL := TRUE; 
+	bReset: BOOL; 
+	bReconfigure: BOOL := TRUE;
+END_VAR
+VAR_INPUT PERSISTENT
+	stThresholdEdge: ST_ALY_Threshold; 
+	fTolerance: LREAL; 
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+	bNewResult: BOOL;
+	bEdge: BOOL;
+	nCount: ULINT;
+	fbTimeLastEvent: FB_ALY_DateTime;
+END_VAR
+VAR
+	
+	R_TRIG_Reconfigure: R_TRIG;
+	
+	fbALY_EdgeCounter_1Ch: FB_ALY_EdgeCounter_1Ch := ( bPersistent:= TRUE );
+END_VAR
+VAR PERSISTENT
+	bConfigured: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="4d95d0d7-45dc-454f-b4df-af8a91219f62">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	nCurrentContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bConfigured THEN
+	bConfigured:= TRUE;
+
+	fTolerance:= 0;
+
+	stThresholdEdge.eComparisonOperator:= E_ALY_ComparisonOperator.GreaterThanOrEqualTo;
+	stThresholdEdge.fThreshold:= 1;
+
+	fbALY_EdgeCounter_1Ch.fTolerance:= fTolerance;
+END_IF
+
+R_TRIG_Reconfigure(CLK:= bReconfigure);
+IF R_TRIG_Reconfigure.Q THEN
+	fbALY_EdgeCounter_1Ch.ConfigureChannel(stThresholdEdge:= stThresholdEdge);
+
+	fbALY_EdgeCounter_1Ch.Configure();
+
+	bReconfigure:= FALSE;
+END_IF
+
+IF bReset THEN
+	Reset();
+END_IF
+
+IF bEnableExecution THEN
+	IF F_HasContext(nCurrentContext, nContext) THEN
+		fbALY_EdgeCounter_1Ch.SetChannelValue(Input:= fDataIn);
+
+		fbALY_EdgeCounter_1Ch.Call(tTimestamp:= tTimestamp);
+
+		bNewResult:= fbALY_EdgeCounter_1Ch.bNewResult;
+		bEdge:= fbALY_EdgeCounter_1Ch.bEdge;
+		nCount:= fbALY_EdgeCounter_1Ch.nCount;
+		fbTimeLastEvent:= fbALY_EdgeCounter_1Ch.fbTimeLastEvent;
+
+		bError:= fbALY_EdgeCounter_1Ch.bError;
+		ipTcResult:= fbALY_EdgeCounter_1Ch.ipResultMessage;
+	END_IF
+ELSE
+	bNewResult:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="081c2b76-4755-4fc1-9554-5c5dbf7c3039">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Reset:= fbALY_EdgeCounter_1Ch.Reset();
+
+bNewResult:= fbALY_EdgeCounter_1Ch.bNewResult;
+bEdge:= fbALY_EdgeCounter_1Ch.bEdge;
+nCount:= fbALY_EdgeCounter_1Ch.nCount;
+fbTimeLastEvent:= fbALY_EdgeCounter_1Ch.fbTimeLastEvent;
+
+bError:= NOT Reset;
+ipTcResult:= fbALY_EdgeCounter_1Ch.ipResultMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="98fdbd3a-033b-43f2-b0f3-9a037e783997">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="1626e2aa-696b-4711-b8dc-6160ee502053">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= E_VirtualInput.eContext_V1_Virtual_Input_Source;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

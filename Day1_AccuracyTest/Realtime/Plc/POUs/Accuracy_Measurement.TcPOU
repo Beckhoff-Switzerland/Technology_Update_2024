@@ -1,0 +1,734 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Accuracy_Measurement" Id="{a01ecdcf-7a38-4bbc-8390-526c0b12f84d}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Accuracy_Measurement
+VAR
+	
+{region 'Axis Control FB'}	
+	fbAxis 						: AXIS_REF;			// Axis to be moved
+	
+	fbPower						: MC_Power;			// Power the axis
+	bPower						: BOOL;
+	                			
+	fbMove						: MC_MoveAbsolute;  // Move the axis
+	bMove						: BOOL;
+	fTarget						: LREAL;
+	fVelocity					: LREAL := 100;
+	fAcceleration				: LREAL;
+	fJerk 						: LREAL;
+	stOutputs					: ST_McOutputs;
+		 
+	fPositionError				: LREAL;			// Load Following error
+	aRollingBuffer				: ARRAY[1..GVL_AccuracyTest.N_NBR_DELAY_CYCLES] OF LREAL; // Dead time of set pos
+		 
+	
+	fbCompensation				: PositionCompensation_1D;  // Compensation
+{endregion}	      	
+	 
+{region 'Load Position'}
+	nLoadPositionRaw AT%I*		: DINT;				// Raw 
+	fLoadPositionScaled 		: LREAL;			// Scaled Position in NC unit
+	fLoadPositionOffset 		: LREAL := -74.157595; // To be calibrated for the current axis
+{endregion}	
+
+{region 'Cycle control'}	
+	aSetposition				: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; // all positions for the measurement
+	aMeasuredData				: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS, 1..2*GVL_AccuracyTest.ciNumCycles] OF LREAL; // Cycles : odd = forward, even = backward
+	nCurrentSetpoint 			: UINT;			//
+	nCurrentCycle	  			: UINT;
+	bBackward					: BOOL;		     // Moving Backward
+	fPositionMin				: LREAL := -170; // initialized from the NC
+	fPositionMax				: LREAL := 30;   // initialized from the NC
+	fStep						: LREAL;
+{endregion}
+
+{region 'ISO 230-2 metrics'}	
+	aAverageForward					: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; 
+	aAverageBackward				: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; 
+	aAverageBidir					: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; 
+	aSigmaForward					: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; 
+	aSigmaBackward					: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; 
+	aReversal						: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL; 
+	fReversalValue					: LREAL;
+	aRepeatabilityForward 			: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL;
+	aRepeatabilityBackward 			: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL;
+	aRepeatabilityBidir				: ARRAY[1..GVL_AccuracyTest.N_NBR_POSITIONS] OF LREAL;
+	fRepeatForward					: LREAL;
+	fRepeatBackWard					: LREAL;
+	fRepeatBidir					: LREAL;
+	fSystematicAccuracyForward 		: LREAL;
+	fSystematicAccuracyBackward		: LREAL;
+	fSystematicAccuracyBidir 		: LREAL;
+	fAverageBidirError				: LREAL;
+	fAccuracyForward 				: LREAL;
+	fAccuracyBackward 				: LREAL;
+	fAccuracyBidir					: LREAL;	
+{endregion}
+	
+
+          			
+
+{region 'Inialization'}                			
+	fScalingNum					: LREAL;
+	fScalingDenum				: LREAL;
+	                    		
+	fbReadAccel					: MC_ReadParameter;
+	fbReadJerk					: MC_ReadParameter;
+	fbReadScalingNum			: MC_ReadParameter;
+	fbReadScalingDenum			: MC_ReadParameter;
+	fbReadMinPos				: MC_ReadParameter;
+	fbReadMaxPos				: MC_ReadParameter;	 
+{endregion}
+	 
+	
+{region 'commands of the program'} 
+	
+	{attribute 'init_on_onlchange' }
+	bInit						: BOOL;					// Start the initalization
+	{attribute 'init_on_onlchange' }
+	bRead						: BOOL;					// Read the init data			
+	
+	bStartMeasure				: BOOL;					// Start the accuracy measurement cycle
+	nStateMeasure				: E_Aquisition_State;
+	
+	bCompute					: BOOL;					// Start the metrics computation
+	
+	bTestAccuracy 				: BOOL;					// Execute the cycle without measurement
+	nStateTestAccuracy			: E_TestAccuracy_State;
+		 
+	bStop 						: BOOL;					// Stop cycles
+	
+	// Data for Scope Display
+	fDisplaySetpointForward, fDisplaySetpointBackward, fDisplayMeasurementForward, fDisplayMeasurementBackward 	: LREAL;
+	fDisplaySetpointComput, fDisplayMeasurementAverageForward, fDisplayMeasurementAverageBackward 				: LREAL;
+	
+	bCompensate					: BOOL;					// Start usung the compensation
+{endregion}	
+
+	
+
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Don't go further if not init
+IF NOT bInit THEN
+	 bRead := TRUE;
+	 Init();
+	 RETURN;
+END_IF
+
+
+//Start Acquistion
+IF bStartMeasure THEN
+	IF fbAxis.Status.Disabled THEN
+		bPower := TRUE;
+	ELSE
+		nCurrentCycle := 0;
+		nCurrentSetpoint := 1;
+		nStateMeasure := E_Aquisition_State.MOVE_TO_FIRST_POS;
+		bStartMeasure := FALSE;
+	END_IF
+END_IF
+
+//Start Measurement
+IF bTestAccuracy THEN
+	IF fbAxis.Status.Disabled THEN
+		bPower := TRUE;
+	ELSE
+		nCurrentSetpoint := 1;
+		nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_FIRST_POS;
+		bTestAccuracy := FALSE;
+	END_IF
+END_IF
+
+// Compute the metrics
+IF bCompute THEN
+	bCompute := FALSE;
+	Compute();
+END_IF
+
+
+// Cyclic Update
+Cycle();
+Acquisition();
+TestAccuracy();
+
+
+
+	
+		
+	]]></ST>
+    </Implementation>
+    <Method Name="Acquisition" Id="{30e62b89-0e2b-4358-b111-ef4f65aa8f1e}">
+      <Declaration><![CDATA[METHOD Acquisition : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* This method moves the axis and aquires the position data to be processed later in the compute method *)
+
+CASE nStateMeasure OF
+	E_Aquisition_State.IDLE: // IDLE
+		;
+		
+	E_Aquisition_State.MOVE_TO_FIRST_POS:
+		fTarget := fPositionMin;
+		bMove := TRUE;
+		nStateMeasure := E_Aquisition_State.WAIT_MOVE_TO_FIRST_POS;
+		
+	E_Aquisition_State.WAIT_MOVE_TO_FIRST_POS:
+		IF stOutputs.Done THEN
+			bMove := FALSE;
+			nStateMeasure :=  E_Aquisition_State.MOVE_TO_TARGET_FORWARD;
+			nCurrentCycle	 := nCurrentCycle+1;
+			nCurrentSetpoint := 1;
+		END_IF
+		
+		IF nCurrentCycle > 2*GVL_AccuracyTest.N_NBR_CYCLES THEN
+			nStateMeasure :=  E_Aquisition_State.DONE;
+		END_IF
+		
+	E_Aquisition_State.MOVE_TO_TARGET_FORWARD:
+		fTarget := aSetposition[nCurrentSetpoint];
+		bMove := TRUE;
+		nStateMeasure := E_Aquisition_State.WAIT_MOVE_TO_TARGET_FORWARD;
+		
+	E_Aquisition_State.WAIT_MOVE_TO_TARGET_FORWARD:
+		IF stOutputs.Done  THEN
+			bMove := FALSE;
+			aMeasuredData[nCurrentSetpoint,nCurrentCycle] := fLoadPositionScaled-aSetposition[nCurrentSetpoint];
+			fDisplayMeasurementForward := aMeasuredData[nCurrentSetpoint,nCurrentCycle];
+			fDisplaySetpointForward := aSetposition[nCurrentSetpoint];
+			nStateMeasure := E_Aquisition_State.MOVE_TO_TARGET_FORWARD;
+			nCurrentSetpoint := nCurrentSetpoint+1;		
+		END_IF
+		IF nCurrentSetpoint > GVL_AccuracyTest.N_NBR_POSITIONS THEN
+			nStateMeasure := E_Aquisition_State.MOVE_TO_LAST_POS;
+		END_IF
+		
+	E_Aquisition_State.MOVE_TO_LAST_POS : 
+		fTarget := fPositionMax;
+		bMove := TRUE;
+		nStateMeasure := E_Aquisition_State.WAIT_MOVE_TO_LAST_POS;	
+	
+	E_Aquisition_State.WAIT_MOVE_TO_LAST_POS:
+		IF stOutputs.Done THEN
+			bMove := FALSE;
+			nStateMeasure := E_Aquisition_State.WAIT_MOVE_TO_TARGET_BACKWARD;
+			nCurrentSetpoint := GVL_AccuracyTest.N_NBR_POSITIONS;
+			nCurrentCycle	 := nCurrentCycle+1;
+		END_IF		
+		IF nCurrentCycle > 2*GVL_AccuracyTest.N_NBR_CYCLES THEN
+			nStateMeasure := E_Aquisition_State.DONE;
+		END_IF
+		
+	E_Aquisition_State.MOVE_TO_TARGET_BACKWARD:
+		fTarget := aSetposition[nCurrentSetpoint];
+		bMove := TRUE;
+		nStateMeasure := E_Aquisition_State.WAIT_MOVE_TO_TARGET_BACKWARD;
+		
+	E_Aquisition_State.WAIT_MOVE_TO_TARGET_BACKWARD:
+		IF stOutputs.Done  THEN
+			bMove := FALSE;
+			aMeasuredData[nCurrentSetpoint,nCurrentCycle] := fLoadPositionScaled-aSetposition[nCurrentSetpoint];
+			fDisplayMeasurementBackward := aMeasuredData[nCurrentSetpoint,nCurrentCycle];
+			fDisplaySetpointBackward := aSetposition[nCurrentSetpoint];
+			nStateMeasure := E_Aquisition_State.MOVE_TO_TARGET_BACKWARD;
+			nCurrentSetpoint := nCurrentSetpoint-1;		
+		END_IF
+		IF nCurrentSetpoint < 1 THEN
+			nStateMeasure := E_Aquisition_State.MOVE_TO_FIRST_POS;
+		END_IF
+		
+	E_Aquisition_State.DONE:
+		bCompute := TRUE;
+		nStateMeasure := E_Aquisition_State.IDLE;
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Compute" Id="{e10d33ae-779a-4788-b1a2-62df5e2f066d}">
+      <Declaration><![CDATA[METHOD Compute : BOOL
+VAR
+	i , j : UINT;
+	aTempDataForward : ARRAY[1..GVL_AccuracyTest.N_NBR_CYCLES] OF LREAL;
+	aTempDataBackward : ARRAY[1..GVL_AccuracyTest.N_NBR_CYCLES] OF LREAL;
+	lrMaxForward		: LREAL;
+	lrMinForward		: LREAL;
+	lrMaxBackward		: LREAL;
+	lrMinBackward		: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* This method computes the positioning accuracy metrics according to ISO 230-2 *)
+
+// ***** initialization ******** //
+lrMinForward  := 1E300;
+lrMinBackward := 1E300;
+lrMaxForward := -1E300;
+lrMaxBackward := -1E300;
+
+// ***** compute data for all positions  ******** //
+FOR i := 1 TO GVL_AccuracyTest.N_NBR_POSITIONS DO
+	// gather all samples for each position
+	FOR j := 1 TO GVL_AccuracyTest.N_NBR_CYCLES DO
+		aTempDataForward[j] := aMeasuredData[i,2*j-1];
+		aTempDataBackward[j] := aMeasuredData[i,2*j];
+	END_FOR
+	
+	// compute the average at this position
+	aAverageForward[i] := average(aTempDataForward);
+	aAverageBackward[i] := average(aTempDataBackward);
+	aAverageBidir[i] := (aAverageForward[i]+aAverageBackward[i])/2;
+	
+	// compute the reversal value  at this position
+	aReversal[i] := aAverageForward[i]-aAverageBackward[i];
+	
+	// compute the standard deviation at this position
+	aSigmaForward[i] := sigma(aTempDataForward,aAverageForward[i]);
+	aSigmaBackward[i] := sigma(aTempDataBackward,aAverageBackward[i]);
+	
+	// find the extremities of each travel
+	lrMaxForward	:= MAX(lrMaxForward,aAverageForward[i]+2*aSigmaForward[i] );
+	lrMinForward	:= MIN(lrMinForward,aAverageForward[i]-2*aSigmaForward[i] );
+	lrMaxBackward	:= MAX(lrMaxBackward,aAverageBackward[i]+2*aSigmaBackward[i] );
+	lrMinBackward   := MIN(lrMinBackward,aAverageBackward[i]-2*aSigmaBackward[i] );
+	
+	// compute the repeatability for each value
+	aRepeatabilityForward[i] := 4*aSigmaForward[i];
+	aRepeatabilityBackward[i] := 4*aSigmaBackward[i];
+	aRepeatabilityBidir[i] := MAX(2*aSigmaForward[i]+2*aSigmaBackward[i]+ABS(aReversal[i]),aRepeatabilityForward[i],aRepeatabilityBackward[i]);
+END_FOR
+
+
+// ***** compute the metrics ******** //
+//  Reversal value (maximum backlash)
+fReversalValue := max_abs_array(aReversal);
+// Repeatability
+fRepeatForward	 := max_abs_array(aRepeatabilityForward);
+fRepeatBackWard := max_abs_array(aRepeatabilityBackward);
+fRepeatBidir	 := max_abs_array(aRepeatabilityBidir);
+// Systematic accuracy (maximal compensation)
+fSystematicAccuracyForward := max_array(aAverageForward) - min_array(aAverageForward) ;
+fSystematicAccuracyBackward := max_array(aAverageBackward) - min_array(aAverageBackward) ;
+fSystematicAccuracyBidir := MAX(max_array(aAverageForward),max_array(aAverageBackward)) - MIN(min_array(aAverageForward),min_array(aAverageBackward));
+// Average Bidirectional error 
+fAverageBidirError			:= max_array(aAverageBidir) - min_array(aAverageBidir);
+//Reversal value
+fAccuracyForward 	:= lrMaxForward-lrMinForward;
+fAccuracyBackward 	:= lrMaxBackward- lrMinBackward;
+fAccuracyBidir		:= MAX(lrMaxForward,lrMaxBackward)-MIN(lrMinForward,lrMinBackward);
+
+// ***** OPTIONAL start the compensation using this data ******** //
+// xCompensate := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Cycle" Id="{eec0348b-d7b9-4aab-99ab-629f89df70b9}">
+      <Declaration><![CDATA[METHOD Cycle : BOOL
+VAR
+	i : DINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* This method takes care of cyclic updates *)
+
+// Keep the axis status up to date
+fbAxis.ReadStatus();
+
+// Manage power of the motor
+fbPower(
+	Axis:= fbAxis, 
+	Enable:= bPower, 
+	Enable_Positive:= TRUE, 
+	Enable_Negative:= TRUE, 
+	Override:= 100, 
+	BufferMode:= , 
+	Options:= , 
+	Status=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> );
+
+// Manage the move absolute command
+fbMove(
+	Axis:= fbAxis, 
+	Execute:= bMove, 
+	Position:= fTarget, 
+	Velocity:= fVelocity, 
+	Acceleration:= fAcceleration, 
+	Deceleration:= fAcceleration, 
+	Jerk:= fJerk, 
+	BufferMode:= , 
+	Options:= , 
+	Done=> stOutputs.Done, 
+	Busy=> stOutputs.Busy, 
+	Active=> stOutputs.Active, 
+	CommandAborted=> stOutputs.CommandAborted, 
+	Error=> stOutputs.Error, 
+	ErrorID=> stOutputs.ErrorID);
+	
+// Compensate the accuracy
+fbCompensation(
+	afCompensationTableForward:= aAverageForward, 
+	afCompensationTableBackward:= aAverageBackward, 
+	fbAxis:= fbAxis, 
+	fStartPosition:= aSetposition[1], 
+	fStopPosition:= aSetposition[GVL_AccuracyTest.N_NBR_POSITIONS], 
+	bEnable:= bCompensate);
+	
+//	Load position 
+fLoadPositionScaled := Scaling(fInput := nLoadPositionRaw, fScalingNum := fScalingNum, fScalingDenum := fScalingDenum) + fLoadPositionOffset;
+
+// Dead time of the Set Position computed in the PLC 
+FOR i := 1 TO  3 DO
+	aRollingBuffer[i] := aRollingBuffer[i+1];
+END_FOR
+aRollingBuffer[i] := fbAxis.NcToPlc.SetPos;
+
+// Load following error
+fPositionError := aRollingBuffer[1] - fLoadPositionScaled ;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Init" Id="{6e174f89-7746-43b9-90f0-e09087eedb90}">
+      <Declaration><![CDATA[METHOD Init : BOOL
+VAR
+	bValid : BOOL := TRUE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* This method reads initialization data from the NC Axis directly *)
+
+bValid := TRUE; 
+
+// Init the acceleration value
+fbReadAccel(
+	Axis:= fbAxis, 
+	Enable:= bRead, 
+	ParameterNumber:= MC_AxisParameter.AxisAcc, 
+	ReadMode:= E_ReadMode.READMODE_CYCLIC, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fAcceleration);	
+	bValid := bValid AND fbReadAccel.Valid;
+
+// Init the jerk value
+fbReadJerk(
+	Axis:= fbAxis, 
+	Enable:= bRead, 
+	ParameterNumber:= MC_AxisParameter.AxisJerk, 
+	ReadMode:= E_ReadMode.READMODE_CYCLIC, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fJerk);	
+	bValid := bValid AND fbReadJerk.Valid;
+	
+// Read the denominator scaling value
+fbReadScalingDenum(
+	Axis:= fbAxis, 
+	Enable:= bRead, 
+	ParameterNumber:= MC_AxisParameter.AxisEncoderScalingDenominator, 
+	ReadMode:= E_ReadMode.READMODE_CYCLIC, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fScalingDenum);	
+	bValid := bValid AND fbReadScalingDenum.Valid;
+
+// Read the numerator scaling value
+fbReadScalingNum(
+	Axis:= fbAxis, 
+	Enable:= bRead, 
+	ParameterNumber:= MC_AxisParameter.AxisEncoderScalingNumerator, 
+	ReadMode:= E_ReadMode.READMODE_CYCLIC, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fScalingNum);	
+	bValid := bValid AND fbReadScalingNum.Valid;
+
+// Read the minimum position
+fbReadMinPos(
+	Axis:= fbAxis, 
+	Enable:= bRead, 
+	ParameterNumber:= MC_AxisParameter.AxisMinSoftPosLimit , 
+	ReadMode:= E_ReadMode.READMODE_CYCLIC, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fPositionMin);
+	bValid := bValid AND fbReadMinPos.Valid;
+	
+// Read the maximal position
+fbReadMaxPos(
+	Axis:= fbAxis, 
+	Enable:= bRead, 
+	ParameterNumber:= MC_AxisParameter.AxisMaxSoftPosLimit, 
+	ReadMode:= E_ReadMode.READMODE_CYCLIC, 
+	Valid=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	Value=> fPositionMax);
+	bValid := bValid AND fbReadMaxPos.Valid;
+
+	
+// If all data is valid, we initialize the steps where the data will be aquired
+// NOTE : we should add a random part for the positions, in order to comply with the norm ISO 230-2	but this is not done here
+IF bValid THEN
+	fStep := (fPositionMax-fPositionMin)/ UINT_TO_LREAL(GVL_AccuracyTest.N_NBR_POSITIONS +1);
+	FOR nCurrentSetpoint := 1 TO GVL_AccuracyTest.N_NBR_POSITIONS DO
+		aSetposition[nCurrentSetpoint] := fStep*UINT_TO_LREAL(nCurrentSetpoint) + fPositionMin;
+	END_FOR
+	bInit := TRUE;
+	bRead := FALSE;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="TestAccuracy" Id="{c7c95391-32a9-4e51-b913-fa92db878469}">
+      <Declaration><![CDATA[METHOD TestAccuracy : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(* This method moves the axis without aquiring the position data *)
+
+CASE nStateTestAccuracy OF
+	
+	E_TestAccuracy_State.IDLE: // IDLE
+		;
+		
+	E_TestAccuracy_State.MOVE_TO_FIRST_POS:
+		fTarget := fPositionMin;
+		bMove := TRUE;
+		nStateTestAccuracy := E_TestAccuracy_State.WAIT_MOVE_TO_FIRST_POS;
+		
+	E_TestAccuracy_State.WAIT_MOVE_TO_FIRST_POS:
+		IF stOutputs.Done THEN						
+			bMove := FALSE;
+			nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_TARGET_FORWARD;
+			nCurrentSetpoint := 1;
+		END_IF
+		
+		IF bStop THEN 
+			nStateTestAccuracy := E_TestAccuracy_State.DONE;
+		END_IF
+		
+	E_TestAccuracy_State.MOVE_TO_TARGET_FORWARD:
+		fTarget := aSetposition[nCurrentSetpoint];
+		bMove := TRUE;
+		nStateTestAccuracy := E_TestAccuracy_State.WAIT_MOVE_TO_TARGET_FORWARD;
+		
+	E_TestAccuracy_State.WAIT_MOVE_TO_TARGET_FORWARD:
+		IF stOutputs.Done  THEN
+			bMove := FALSE;
+			nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_TARGET_FORWARD;
+			nCurrentSetpoint := nCurrentSetpoint+1;		
+		END_IF
+		IF nCurrentSetpoint > GVL_AccuracyTest.N_NBR_POSITIONS THEN
+			nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_LAST_POS;
+		END_IF
+		
+	E_TestAccuracy_State.MOVE_TO_LAST_POS : 
+		fTarget := fPositionMax;
+		bMove := TRUE;
+		nStateTestAccuracy := E_TestAccuracy_State.WAIT_MOVE_TO_LAST_POS;	
+	
+	E_TestAccuracy_State.WAIT_MOVE_TO_LAST_POS:
+		IF stOutputs.Done THEN
+			bMove := FALSE;
+			nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_TARGET_BACKWARD;
+			nCurrentSetpoint := GVL_AccuracyTest.N_NBR_POSITIONS;
+		END_IF		
+		IF bStop THEN
+			nStateTestAccuracy := E_TestAccuracy_State.DONE;
+		END_IF
+		
+	E_TestAccuracy_State.MOVE_TO_TARGET_BACKWARD:
+		fTarget := aSetposition[nCurrentSetpoint];
+		bMove := TRUE;
+		nStateTestAccuracy := E_TestAccuracy_State.WAIT_MOVE_TO_TARGET_BACKWARD;
+		
+	E_TestAccuracy_State.WAIT_MOVE_TO_TARGET_BACKWARD:
+		IF stOutputs.Done  THEN
+			bMove := FALSE;
+			nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_TARGET_BACKWARD;
+			nCurrentSetpoint := nCurrentSetpoint-1;		
+		END_IF
+		IF nCurrentSetpoint < 1 THEN
+			nStateTestAccuracy := E_TestAccuracy_State.MOVE_TO_FIRST_POS;
+		END_IF
+		
+	E_TestAccuracy_State.DONE:
+		nStateTestAccuracy := E_TestAccuracy_State.IDLE;
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="Accuracy_Measurement">
+      <LineId Id="3951" Count="46" />
+      <LineId Id="326" Count="0" />
+    </LineIds>
+    <LineIds Name="Accuracy_Measurement.Acquisition">
+      <LineId Id="108" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="13" Count="1" />
+      <LineId Id="16" Count="1" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="19" Count="2" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="83" Count="3" />
+      <LineId Id="26" Count="1" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="34" Count="2" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="96" Count="1" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="41" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="51" Count="1" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="53" Count="5" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="91" Count="1" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="62" Count="7" />
+      <LineId Id="98" Count="1" />
+      <LineId Id="70" Count="5" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="Accuracy_Measurement.Compute">
+      <LineId Id="114" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="28" Count="2" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="105" Count="3" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="33" Count="1" />
+      <LineId Id="66" Count="2" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="82" Count="0" />
+    </LineIds>
+    <LineIds Name="Accuracy_Measurement.Cycle">
+      <LineId Id="479" Count="57" />
+      <LineId Id="48" Count="0" />
+    </LineIds>
+    <LineIds Name="Accuracy_Measurement.Init">
+      <LineId Id="124" Count="0" />
+      <LineId Id="74" Count="1" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="23" Count="8" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="32" Count="10" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="45" Count="10" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="57" Count="9" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="88" Count="9" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="100" Count="8" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="128" Count="1" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="111" Count="3" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="70" Count="0" />
+    </LineIds>
+    <LineIds Name="Accuracy_Measurement.TestAccuracy">
+      <LineId Id="89" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="10" Count="3" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="14" Count="3" />
+      <LineId Id="19" Count="14" />
+      <LineId Id="37" Count="16" />
+      <LineId Id="55" Count="12" />
+      <LineId Id="71" Count="7" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

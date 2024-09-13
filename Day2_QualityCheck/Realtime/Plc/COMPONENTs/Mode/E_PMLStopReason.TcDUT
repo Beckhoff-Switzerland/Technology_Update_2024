@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="E_PMLStopReason" Id="{2fa264e1-93fa-4ad0-bce2-500fdbbab504}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+TYPE E_PMLStopReason :
+(
+	None := 0,
+	Abort_EStop := 1,
+	Abort_User := 2,
+	Held_Material := 3,
+	Held_Ingredients := 4,
+	Stop_Actuators := 5,
+	Stop_Sensors := 6,
+	Suspend_Starved := 7,
+	Suspend_Blocked := 8
+) DINT := None;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

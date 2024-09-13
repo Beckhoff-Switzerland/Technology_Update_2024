@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_DataBuffer" Id="90866879-6785-40c3-a2e7-7f74d3e64589" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_DataBuffer
+VAR_OUTPUT
+	nElements: UDINT;
+END_VAR
+VAR
+	_nDataSize: UDINT;
+	
+	_pWriteBuffer: POINTER TO BYTE;
+	_pWriteBufferTime: POINTER TO ARRAY [1..cEntryCount] OF ULINT;
+	_pReadBuffer: POINTER TO BYTE;
+	_pReadBufferTime: POINTER TO ARRAY [1..cEntryCount] OF ULINT;
+	
+	_pBuffer1: POINTER TO BYTE;
+	_aBufferTime1: ARRAY [1..cEntryCount] OF ULINT;
+	_pBuffer2: POINTER TO BYTE;
+	_aBufferTime2: ARRAY [1..cEntryCount] OF ULINT;
+	
+	_nBufferIdx: INT := 1;
+	
+	_nBufferEntry_Add: UDINT;
+	
+	_bLock: BOOL;
+	
+END_VAR
+VAR CONSTANT
+	cEntryCount: UDINT := 25;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_init" Id="eddd9e91-0122-41bd-b3a9-e2780fac8939">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains: BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode: BOOL; // if TRUE, the instance afterwards gets moved into the copy code (online change)
+	nDataSize: UDINT;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN
+	_nDataSize:= nDataSize;
+	_Init();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_exit" Id="950a2550-4520-49f8-bb98-b577ac5e65a8">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode: BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _pBuffer1 <> 0 THEN
+	__DELETE(_pBuffer1);
+END_IF
+
+IF _pBuffer2 <> 0 THEN
+	__DELETE(_pBuffer2);
+END_IF
+
+_pWriteBuffer:= 0;
+_pWriteBufferTime:= 0;
+_pReadBuffer:= 0;
+_pReadBufferTime:= 0;
+
+_nBufferIdx:= 0;
+_nBufferEntry_Add:= 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_Init" Id="48b4b925-3d25-410e-8870-932e28663aba">
+      <Declaration><![CDATA[METHOD PRIVATE _Init : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _pBuffer1 <> 0 THEN
+	__DELETE(_pBuffer1);
+END_IF
+
+IF _pBuffer2 <> 0 THEN
+	__DELETE(_pBuffer2);
+END_IF
+
+_pBuffer1 := __NEW(BYTE, (_nDataSize * cEntryCount));
+_pBuffer2 := __NEW(BYTE, (_nDataSize * cEntryCount));
+
+_nBufferIdx:= 0;
+
+Call();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Call" Id="2703a1bb-240c-4386-b15a-3f52f79306f1">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[nElements:= 0;
+
+IF TestAndSet(_bLock) THEN
+
+	_nBufferIdx:= _nBufferIdx + 1;
+	IF _nBufferIdx >= 3 THEN
+		_nBufferIdx:= 1;
+	END_IF
+
+	CASE _nBufferIdx OF
+		1:
+			_pWriteBuffer:= _pBuffer1;
+			_pReadBuffer:= _pBuffer2;
+
+			_pWriteBufferTime:= ADR(_aBufferTime1);
+			_pReadBufferTime:= ADR(_aBufferTime2);
+		2:
+			_pWriteBuffer:= _pBuffer2;
+			_pReadBuffer:= _pBuffer1;
+
+			_pWriteBufferTime:= ADR(_aBufferTime2);
+			_pReadBufferTime:= ADR(_aBufferTime1);
+	END_CASE
+
+	nElements:= _nBufferEntry_Add;
+
+	_nBufferEntry_Add:= 0;
+	_bLock:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AddData" Id="845f35a5-fdc7-4f68-950b-b3f316ece75d">
+      <Declaration><![CDATA[METHOD AddData : BOOL
+VAR_INPUT
+	pDataIn: PVOID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF TestAndSet(_bLock) THEN
+
+	IF _pWriteBuffer <> 0 AND pDataIn <> 0 THEN
+
+		IF _nBufferEntry_Add >= cEntryCount THEN
+			_nBufferEntry_Add:= cEntryCount - 1;
+		END_IF
+
+		MEMCPY(_pWriteBuffer + (_nBufferEntry_Add * _nDataSize), pDataIn, _nDataSize);
+
+		_nBufferEntry_Add:= _nBufferEntry_Add + 1;
+
+		IF _pWriteBufferTime <> 0 THEN
+			_pWriteBufferTime^[_nBufferEntry_Add]:= F_GetActualDcTime64();
+		END_IF
+
+	END_IF
+
+	_bLock:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetData" Id="0b539f39-754d-4e44-a7bb-561353c0bd14">
+      <Declaration><![CDATA[METHOD GetData : BOOL
+VAR_INPUT
+	nElement: UDINT(1..cEntryCount);
+	pDataOut: PVOID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF nElement <= nElements THEN
+	IF pDataOut <> 0 AND _pReadBuffer <> 0 THEN
+		MEMCPY(pDataOut, _pReadBuffer + ((nElement-1) * _nDataSize), _nDataSize);
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetTimestamp" Id="9b330080-267e-4ae3-833a-19e27d8d05c3">
+      <Declaration><![CDATA[METHOD GetTimestamp : ULINT
+VAR_INPUT
+	nElement: UDINT(1..cEntryCount);
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _pReadBufferTime <> 0 THEN
+	GetTimestamp:= _pReadBufferTime^[nElement];
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

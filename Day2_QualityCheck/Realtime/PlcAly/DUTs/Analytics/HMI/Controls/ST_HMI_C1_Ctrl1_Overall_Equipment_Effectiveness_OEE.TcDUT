@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE" Id="fec9de58-41fd-4c27-a3bd-6e84abe44b26">
+    <Declaration><![CDATA[TYPE ST_HMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE : 
+STRUCT
+	//Overall Equipment Effectiveness (OEE)
+	bTrigReconfigure: BOOL;
+	fM6_fOEE: LREAL; //Overall equipment effectiveness (OEE)
+	fM6_fAvailability: LREAL; //Availability
+	fM6_fPerformance: LREAL; //Performance
+	fM6_fQuality: LREAL; //Quality
+	fM6_fThresholdLevelOkWarning: LREAL; //Level Ok / Warning
+	fM6_fThresholdLevelWarningAlarm: LREAL; //Level Warning / Alarm
+	eM6_eOeeClass: E_ALY_Classification_3Cls; //OEE Classification
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

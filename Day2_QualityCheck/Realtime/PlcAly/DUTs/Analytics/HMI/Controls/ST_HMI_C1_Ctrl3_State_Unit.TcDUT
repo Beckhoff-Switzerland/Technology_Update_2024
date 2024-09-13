@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_C1_Ctrl3_State_Unit" Id="ac90f9eb-6b85-4ac6-a37d-714c7691a858">
+    <Declaration><![CDATA[TYPE ST_HMI_C1_Ctrl3_State_Unit : 
+STRUCT
+	//State_Unit
+	bTrigReconfigure: BOOL;
+	sM1_sOutput: STRING(255); //Value
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

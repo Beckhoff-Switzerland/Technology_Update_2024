@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="E_ObservationState" Id="{85bc2139-e108-4bd5-82e1-1479dc06f46a}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_ObservationState :
+(
+	Idle := 0,
+	Observing,
+	Qualifying,
+	Done
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

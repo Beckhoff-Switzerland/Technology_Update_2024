@@ -1,0 +1,411 @@
+html {
+    font-family: RobotoCondensed, 'Microsoft YaHei', '微软雅黑', 'Hiragino Sans GB', '冬青黑体', 'STXihei', '华文细黑', 'WenQuanYi Micro Hei', 'Meiryo', 'メイリオ', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ ProN', 'Noto Sans CJK SC', 'Noto Sans CJK TC', 'Noto Sans CJK JP', 'Noto Sans CJK KR', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+}
+
+.tchmi-textblock-template {
+    color: #111111;
+}
+
+.tchmi-textblock {
+    color: #111111;
+}
+
+#TcHmiNavBarMenu {
+    box-shadow: rgb(139, 139, 139) 0px 3px 2px -1px;
+}
+
+/*
+    Custom Control Border for Default class
+*/
+.tchmi-class-Default {
+    box-shadow: 0 1px 1px 0 rgba(130,130,130,.4), 0 1px 3px 1px rgba(130,130,130,.8);
+}
+
+/**
+ * Splash Screen Dialog
+ */
+#tchmi-splash-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    display: flex;
+}
+
+@media screen and (min-width: 800px) {
+    #tchmi-splash-container .tchmi-splash-content-container {
+        font-size: x-large;
+        width: 800px;
+        height: 600px;
+        position: relative;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        margin: auto;
+        overflow: hidden;
+        background: url("Images/Splash-800x600.png");
+        box-shadow: 0 0 12px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    #tchmi-splash-container .tchmi-splash-stage-progress-container {
+        position: absolute;
+        left: 362px;
+        top: 395px;
+        right: 0px;
+        bottom: 0px;
+        width: 412px;
+        background: #ccc;
+        height: 23px;
+    }
+
+    #tchmi-splash-container .tchmi-splash-stage-progress {
+        width: 0%;
+        height: 100%;
+        background: #7493CC;
+    }
+
+    #tchmi-splash-container .tchmi-splash-stage-info {
+        position: absolute;
+        left: 362px;
+        top: 418px;
+        right: 0px;
+        bottom: 0px;
+        width: 412px;
+        height: 23px;
+        font-size: 14px;
+    }
+
+    #tchmi-splash-container .tchmi-splash-version-info {
+        position: absolute;
+        left: 5px;
+        top: 580px;
+        right: 0px;
+        bottom: 0px;
+        width: 412px;
+        height: 20px;
+        font-size: 12px;
+    }
+}
+
+@media not screen and (min-width: 800px) {
+    #tchmi-splash-container .tchmi-splash-content-container {
+        font-size: x-large;
+        width: 320px;
+        height: 568px;
+        position: relative;
+        left: 0px;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        margin: auto;
+        overflow: hidden;
+        background: url("Images/Splash-320x568.png");
+        box-shadow: 0 0 12px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    #tchmi-splash-container .tchmi-splash-stage-progress-container {
+        position: absolute;
+        left: 17px;
+        top: 489px;
+        right: 0px;
+        bottom: 0px;
+        width: 283px;
+        background: #ccc;
+        height: 20px;
+    }
+
+    #tchmi-splash-container .tchmi-splash-stage-progress {
+        width: 0%;
+        height: 100%;
+        background: #7493CC;
+    }
+
+    #tchmi-splash-container .tchmi-splash-stage-info {
+        position: absolute;
+        left: 17px;
+        top: 510px;
+        right: 0px;
+        bottom: 0px;
+        width: 283px;
+        height: 14px;
+        font-size: 12px;
+    }
+
+    #tchmi-splash-container .tchmi-splash-version-info {
+        position: absolute;
+        left: 5px;
+        top: 552px;
+        right: 0px;
+        bottom: 0px;
+        width: 283px;
+        height: 20px;
+        font-size: 10px;
+    }
+}
+/** 
+* View Loading Spinner
+* Usage: <div class="tchmi-view-loading-spinner-container"><div class="tchmi-view-loading-spinner"><div></div><div></div><div></div><div></div></div></div>
+*/
+:root {
+    --tchmi-view-loading-spinner-color: #4c6374;
+}
+
+@keyframes tchmi-view-loading-spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.tchmi-view-loading-spinner-container {
+    display: none; /** DEBUG ONLY */
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.tchmi-view-loading-spinner {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+    .tchmi-view-loading-spinner div {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 51px;
+        height: 51px;
+        margin: 6px;
+        border: 6px solid var(--tchmi-view-loading-spinner-color);
+        border-radius: 50%;
+        animation: tchmi-view-loading-spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: var(--tchmi-view-loading-spinner-color) transparent transparent transparent;
+    }
+
+        .tchmi-view-loading-spinner div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+
+        .tchmi-view-loading-spinner div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+
+        .tchmi-view-loading-spinner div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+
+/*Icons*/
+.usermanagementIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_usermanagement_black.svg");
+}
+
+.hover .usermanagementIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_usermanagement_white.svg");
+}
+.layoutIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_layout_black.svg");
+}
+
+.hover .layoutIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_layout_white.svg");
+}
+
+.layoutEditIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_edit_properties_black.svg");
+}
+
+.hover .layoutEditIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_edit_properties_white.svg");
+}
+
+.layoutSaveIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_save_black.svg");
+}
+
+.hover .layoutSaveIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_save_white.svg");
+}
+.disabled .layoutSaveIcon {
+    opacity:0.4;
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_save_black.svg");
+}
+
+.layoutResetIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_reset_black.svg");
+}
+
+.hover .layoutResetIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_reset_white.svg");
+}
+
+.eventviewIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_eventview_black.svg");
+}
+
+.hover .eventviewIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_eventview_white.svg");
+}
+.settingsIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_settings_black.svg");
+}
+
+.hover .settingsIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_settings_white.svg");
+}
+
+.logoutIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_logout_black.svg");
+}
+
+.hover .logoutIcon {
+    background-image: url("/Beckhoff.TwinCAT.HMI.Analytics.Controls/Menu/Icons/TcAnalyticsHmi_logout_white.svg");
+}
+
+
+
+/* UserManagement Popups*/
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement,
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-Dropdown,
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup {
+    --tchmi-background: rgba(255, 255, 255, 0.35);
+    --tchmi-background-pressed: rgba(255, 255, 255, 0.35);
+    --tchmi-text-color: #4c6374;
+    --tchmi-text-color-pressed: #4c6374;
+    --tchmi-button-background: linear-gradient(135deg, rgb(73, 148, 218) 0%, rgb(65, 98, 176));
+    --tchmi-button-background-pressed: linear-gradient(135deg, rgb(65, 98, 176) 0%, rgb(73, 148, 218) 100%);
+    --tchmi-arrow-stroke: #ffffff;
+    --tchmi-arrow-stroke-pressed: #ffffff;
+    --tchmi-popup-background: rgb(255, 255, 255);
+    --tchmi-popup-color: #4c6374;
+    --tchmi-popup-cancel-color: rgb(227, 6, 19);
+    --tchmi-popup-shadow: rgba(0, 0, 0, 0.6);
+    --tchmi-dropdown-background: rgb(255, 255, 255);
+    --tchmi-dropdown-background-hover: #4794da;
+    --tchmi-dropdown-text-color: #4c6374;
+    --tchmi-dropdown-text-color-hover: rgb(255, 255, 255);
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement {
+    background: var(--tchmi-background);
+}
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement-Template
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement-button {
+        stroke: var(--tchmi-arrow-stroke);
+        background: var(--tchmi-button-background);
+    }
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement.down {
+        background: var(--tchmi-background-pressed);
+    }
+
+        .TcHmi_Controls_Beckhoff_TcHmiUserManagement.down
+        .TcHmi_Controls_Beckhoff_TcHmiUserManagement-Template
+        .TcHmi_Controls_Beckhoff_TcHmiUserManagement-button {
+            stroke: var(--tchmi-arrow-stroke-pressed);
+            background: var(--tchmi-button-background-pressed);
+            box-shadow: inset 0px 0px 0px 1px rgb(0 0 0 / 2%), inset 0px 0px 3px 2px rgb(0 0 0 / 30%);
+        }
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement .TcHmi_Controls_Beckhoff_TcHmiUserManagement-Base {
+        color: var(--tchmi-text-color);
+    }
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement.down .TcHmi_Controls_Beckhoff_TcHmiUserManagement-Base {
+        color: var(--tchmi-text-color-pressed);
+    }
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup {
+    background: var(--tchmi-popup-background);
+    color: var(--tchmi-popup-color);
+    box-shadow: 0px 0px 6px 1px var(--tchmi-popup-shadow);
+}
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup svg {
+        stroke: var(--tchmi-popup-color);
+    }
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup-header-x.down {
+    background: var(--tchmi-popup-cancel-color);
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-Dropdown {
+    background: var(--tchmi-dropdown-background);
+    box-shadow: inset -7px 0px 6px -7px rgba(0, 0, 0, 0.6), inset 7px 0px 6px -7px rgba(0, 0, 0, 0.6), inset 0px -7px 6px -7px rgba(0, 0, 0, 0.6);
+}
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement-Dropdown.above-control {
+        box-shadow: inset -7px 0px 6px -7px rgba(0, 0, 0, 0.6), inset 7px 0px 6px -7px rgba(0, 0, 0, 0.6), inset 0px 7px 6px -7px rgba(0, 0, 0, 0.6);
+    }
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-Dropdown-Element {
+    color: var(--tchmi-dropdown-text-color);
+}
+
+    .TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-Dropdown-Element:hover {
+        background: var(--tchmi-dropdown-background-hover);
+        color: var(--tchmi-dropdown-text-color-hover);
+    }
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement {
+    box-shadow: rgba(0, 0, 0, 0.208) 1px 1px 2px 0px;
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-button {
+    width: 48px;
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup-groups[data-scroll='top'] {
+    box-shadow: inset 0 -5px 5px 0 rgba(0, 0, 0, 0.05);
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup-groups[data-scroll='center'] {
+    box-shadow: inset 0 5px 5px 0 rgba(0, 0, 0, 0.05), inset 0 -5px 5px 0 rgba(0, 0, 0, 0.05);
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup-groups[data-scroll='bottom'] {
+    box-shadow: inset 0 5px 5px 0 rgba(0, 0, 0, 0.05);
+}
+
+.TcHmi_Controls_Beckhoff_TcHmiUserManagement-template-popup-feedback{
+    color: red;
+}
+/**TcHmiButton (UserMangement Popups)*/
+.TcHmi_Controls_Beckhoff_TcHmiButton, .tchmi-button {
+    --tchmi-background: linear-gradient(135deg, #eff1f3, #aeb9c2);
+    --tchmi-color: #4793da;
+    --tchmi-background-pressed: linear-gradient(135deg, #aeb9c2, #eff1f3);
+    --tchmi-color-pressed: #4c6374;
+    background-image: var(--tchmi-background);
+    color: var(--tchmi-color);
+    border-color: #4794da;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.6);
+}
+
+    .TcHmi_Controls_Beckhoff_TcHmiButton.down, .tchmi-button.down {
+        background-image: var(--tchmi-background-pressed);
+        color: var(--tchmi-color-pressed);
+        box-shadow: inset 0px 0px 10px 0px rgba(0,0,0,0.3);
+    }
+	/* dim background of topmostlayer */
+.tchmi-system-topmostlayer-container.tchmi-topmostlayer-background-dim {
+    background-color: rgba(0, 0, 0, 0.5);
+}

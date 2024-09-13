@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <GVL Name="Analytics" Id="4a7a84ca-d437-4e17-8800-0c3f99e405ff">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	//DataSources
+	//Live:
+	fbT1_InputSource: FB_T1_InputSource;
+	//Historical:
+	//Empty:
+	
+	fbT1_IecCriticalSection: FB_IecCriticalSection;
+	
+	//Historical DataSource parameter
+	nHistMaxInputBuffer: UDINT := 100;
+	nHistMaxSampleCount: UDINT := 100;
+	
+	stReset: ST_AnalysisReset;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

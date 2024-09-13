@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <Itf Name="I_InputSourceHistorical" Id="645ecb90-1f81-443d-b75f-a09d406e0b80">
+    <Declaration><![CDATA[INTERFACE I_InputSourceHistorical EXTENDS I_InputSource]]></Declaration>
+    <Method Name="HistoricalCtrl" Id="41ae363a-5533-4b76-84fd-cd047f546f93">
+      <Declaration><![CDATA[METHOD HistoricalCtrl : BOOL
+VAR_INPUT
+	stCtrl: REFERENCE TO ST_HMI_InputSourceCtrl;
+	stHistStreamInfo: REFERENCE TO ST_HMI_DataSourceHist;
+	stRecordInfo: REFERENCE TO ST_HMI_DataSourceHistRecordInfo;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="UpdateRecordList" Id="7b9143b4-fbc0-46f6-afba-2735bcb16ea2">
+      <Declaration><![CDATA[METHOD UpdateRecordList : BOOL
+VAR_INPUT
+	sStreamSystemID: GUID;
+	stHistStreamInfo: REFERENCE TO ST_HMI_DataSourceHist;
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="bCtrlChanged" Id="5cd23029-b103-481f-a181-b81e2d760a70">
+      <Declaration><![CDATA[PROPERTY bCtrlChanged : BOOL]]></Declaration>
+      <Get Name="Get" Id="16f1a860-a4bb-4799-8232-d9398248fc90">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>

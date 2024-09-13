@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_ProductDataA" Id="{60709667-429a-40f1-9752-df19484c3ac5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ProductDataA EXTENDS FB_XTS_ProductData IMPLEMENTS I_ProductDataA
+VAR
+	stData 	: ST_ProductDataA;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Data" Id="{b6e3ed4a-f410-4d25-9730-b9dfa58db76a}">
+      <Declaration><![CDATA[{attribute 'monitoring':='call'}
+PROPERTY Data : REFERENCE TO ST_ProductDataA ]]></Declaration>
+      <Get Name="Get" Id="{c4675546-e9e3-453c-94ed-8c600b4e1f21}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Data REF= stData;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_ProductDataA">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ProductDataA.Data.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

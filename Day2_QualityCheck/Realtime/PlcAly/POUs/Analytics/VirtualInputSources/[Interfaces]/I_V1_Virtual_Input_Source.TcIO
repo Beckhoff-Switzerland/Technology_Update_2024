@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <Itf Name="I_V1_Virtual_Input_Source" Id="661604dc-1a99-4680-8897-20e6bf6d6450">
+    <Declaration><![CDATA[INTERFACE I_V1_Virtual_Input_Source EXTENDS I_VirtualInputSource]]></Declaration>
+    <Property Name="nV1_tMlCalculation" Id="f0d3ac12-416b-4da2-84b0-693194305e3d">
+      <Declaration><![CDATA[PROPERTY nV1_tMlCalculation : UDINT]]></Declaration>
+      <Get Name="Get" Id="f90f10c2-0d23-46cf-94e5-7e5c28126901">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="nV1_nUnitsProduced" Id="dad5736f-eb78-4bbc-b8eb-6a583522b7c7">
+      <Declaration><![CDATA[PROPERTY nV1_nUnitsProduced : ULINT]]></Declaration>
+      <Get Name="Get" Id="d614fc1e-5014-404e-a2cd-abd5bfcc066b">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="nV1_nDefectiveUnits" Id="0ed0c310-7a83-43c8-988e-de007ff4b487">
+      <Declaration><![CDATA[PROPERTY nV1_nDefectiveUnits : ULINT]]></Declaration>
+      <Get Name="Get" Id="ce546a8d-7f26-4509-958c-492720c3e1d0">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="nV1_nState" Id="09e98601-c401-4f65-8fea-6ef7c0826bda">
+      <Declaration><![CDATA[PROPERTY nV1_nState : UINT]]></Declaration>
+      <Get Name="Get" Id="435f2981-d226-422e-b3a5-e6082188cfe0">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>

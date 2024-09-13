@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_StationBase" Id="{f1c9299e-de59-4e5a-bd4a-6316a5e0d342}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_StationBase IMPLEMENTS I_StationProcess
+VAR
+	nState : E_StationProcessState;
+	nStep : INT;
+	eOpMode : E_OpMode;	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="SetOpMode" Id="{fe901621-e22a-4e03-8201-c10aba77730b}">
+      <Declaration><![CDATA[PROPERTY SetOpMode : E_OpMode]]></Declaration>
+      <Set Name="Set" Id="{8f82aa42-a889-4905-8c69-78ade07669ef}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[eOpMode := SetOpMode;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="State" Id="{9c93c658-0676-4baf-b280-e93293c7fde3}">
+      <Declaration><![CDATA[PROPERTY State : E_StationProcessState
+]]></Declaration>
+      <Get Name="Get" Id="{156d2153-d734-4b7d-8074-021806edce15}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[State := nState;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c4bed313-fb1e-488e-b41a-49b06a6a092b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nState := State;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Update" Id="{b5d99acf-ae47-4c6f-b75a-0da4ee7edd18}">
+      <Declaration><![CDATA[METHOD Update
+VAR_INPUT
+	iStation : I_XTS_Station_PLC;
+END_VAR
+VAR_INST
+	fbTriggerMoverInPlace : R_TRIG; 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//This is executed once when the mover arrives at the station
+fbTriggerMoverInPlace(CLK:= iStation.AreMoversInPlace);
+IF fbTriggerMoverInPlace.Q THEN
+	State := E_StationProcessState.ProcessStart;
+END_IF
+IF iStation.AreMoversInPlace = FALSE THEN
+	State := E_StationProcessState.Idle;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

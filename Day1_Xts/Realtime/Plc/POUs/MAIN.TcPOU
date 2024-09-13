@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{52429c9e-2181-49b1-974d-1d17645bc0c7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR CONSTANT
+	N_NBR_MOVERS : USINT := 6;
+	N_NBR_STATIONS : USINT := 10;
+END_VAR
+VAR
+	bInitDone, bEnable, bDisable, bStart, bRestart : BOOL;
+	bStartSimulation, bStopSimulation : BOOL ;	
+	bAllStationsReady : BOOL := TRUE;
+
+	nLoopIndex : UINT;
+	iStation : I_XTS_Station;
+	bWaitingStation : BOOL;	
+	nIndexStationToCommandMoverInto, nIndexStationToMoveAferStart : UINT;
+
+
+	
+	fbSystem		: CHALET_Xts.FB_XTS_System;
+	iXtsSystem 		: I_XTS_System_PLC := fbSystem;
+
+	fbEnvironment	: CHALET_Xts.FB_XTS_Environment(ipXtsSystem := fbSystem);
+	
+	fbGroup			: CHALET_Xts.FB_XTS_Group(ipXtsSystem := fbSystem);
+	
+	aMovers			: ARRAY[1..N_NBR_MOVERS] OF CHALET_Xts.FB_XTS_Mover(ipXtsSystem := fbSystem);
+	
+	aStations		: ARRAY[1..N_NBR_STATIONS] OF CHALET_Xts.FB_XTS_Station[
+	
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 1750,
+												sStationID			:= 'Loading',
+												nMoverQueueSize		:= 2,
+												fMoverGapAtExit		:= 100,
+												fMoverVelocityAtExit:= 500),
+
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 1950,
+												sStationID			:= 'Wait',
+												nMoverQueueSize		:= 1,
+												fMoverGapAtExit		:= 100,
+												fMoverVelocityAtExit:= 500),	
+
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 2100.54,
+												sStationID			:= 'Mounting',
+												nMoverQueueSize		:= 1,
+												fMoverGapAtExit		:= 200,
+												fMoverVelocityAtExit:= 500),
+												
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 550,
+												sStationID			:= 'Unloading',
+												nMoverQueueSize		:= 3,
+												fMoverGapAtExit		:= 80,
+												fMoverVelocityAtExit:= 500),
+												
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 1000,
+												sStationID			:= 'WaitBuffer',
+												nMoverQueueSize		:= 4,
+												fMoverGapAtExit		:= 80,
+												fMoverVelocityAtExit:= 200),
+	
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 1350,
+												sStationID			:= 'WaitLoading',
+												nMoverQueueSize		:= 2,
+												fMoverGapAtExit		:= 80,
+												fMoverVelocityAtExit:= 200),
+
+												(ipXtsSystem		:= fbSystem,
+												fPositionOnTrack	:= 1500,
+												sStationID			:= 'Trigger1',
+												nMoverQueueSize		:= 0,
+												fMoverGapAtExit		:= 200,
+												fMoverVelocityAtExit:= 500),
+												
+												(ipXtsSystem		:= fbSystem,
+												fPositionOnTrack	:= 2500,
+												sStationID			:= 'Trigger2',
+												nMoverQueueSize		:= 0,
+												fMoverGapAtExit		:= 100,
+												fMoverVelocityAtExit:= 200),
+
+												(ipXtsSystem		:= fbSystem,
+												fPositionOnTrack	:= 0,
+												sStationID			:= 'Trigger3',
+												nMoverQueueSize		:= 0,
+												fMoverGapAtExit		:= 200,
+												fMoverVelocityAtExit:= 500),
+												
+												(ipXtsSystem 		:= fbSystem,
+												fPositionOnTrack	:= 2400,
+												sStationID			:= 'Calibration',
+												nMoverQueueSize		:= 1,
+												fMoverGapAtExit		:= 200,
+												fMoverVelocityAtExit:= 500)];										
+												
+		
+
+	stCommand : CHALET_Xts.Tc3_XTS_Utility.ST_TcIoXtsMoverCommand;
+	refCommandHistory : REFERENCE TO ARRAY[1..CHALET_Xts.Tc3_XTS_Utility.TcIoXtsEnvironmentParameterList.MaxMessageCommandHistory] OF CHALET_Xts.Tc3_XTS_Utility.ST_TcIoXtsMoverCommand;
+
+	// change of Gap Control Mode
+	bFast, bStandard : BOOL;
+	
+	// Calibration
+	bCalibration : BOOL;												
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(*	Todo in a new Tc project:
+	- Add Groupe + link
+	- StopPositions in XtsStationInfo set to 25 Array
+	- Set raillength in groupe
+	- Info Server: Stations link
+	-
+*)
+
+IF NOT bInitDone THEN
+	fbSystem.Initialize();
+	bInitDone := fbSystem.Initialized;
+	iXtsSystem := fbSystem;
+	RETURN;
+END_IF
+
+// Enabling the System is only possible after a successful Disabling
+IF bEnable AND iXtsSystem.Initialized AND iXtsSystem.Disabled THEN
+	bEnable := FALSE;	
+	iXtsSystem.Enable();
+END_IF
+
+// Disabling the System is allways possible
+// while E-Stop call disable Methode before cutting 48V
+IF bDisable THEN
+	bDisable := FALSE;
+	iXtsSystem.Disable();
+	// set opeationMode to Off
+	PRG_Example_Station.setOpMode := E_OpMode.Off;
+END_IF
+
+// command all movers into the default station.
+IF bStart AND iXtsSystem.Enabled THEN
+	// All changes to the dynamic parameters are suppressed, as the start movement is normally slower.
+	iXtsSystem.SuppressAllDynamicsChanges := TRUE;	
+	bAllStationsReady := FALSE;	
+
+	// delete all Queues
+	FOR nLoopIndex := 1 TO N_NBR_STATIONS DO
+		aStations[nLoopIndex].DeleteMoversQueue();
+	END_FOR
+
+	// send all mover in waiting station and as the next station selct the default station
+	nIndexStationToMoveAferStart  := 1;	
+	nIndexStationToCommandMoverInto := 5;	
+	FOR nLoopIndex := 1 TO N_NBR_MOVERS DO
+		aMovers[nLoopIndex].TargedStation := aStations[nIndexStationToCommandMoverInto].LUID;
+		aMovers[nLoopIndex].MoveAbsCA(fPosition:=aStations[nIndexStationToCommandMoverInto].PositionOnTrack, fVelocity := 500, fGap := aStations[nIndexStationToCommandMoverInto].StationBehinde.MoverGapAtExit, eDirection := Tc3_Mc3Definitions.MC_DIRECTION.mcDirectionPositive);
+		aStations[nIndexStationToCommandMoverInto].AddMoverToQueue(aMovers[nLoopIndex]);
+	END_FOR
+	
+	IF aStations[nIndexStationToCommandMoverInto].AreMoversInPlace THEN
+		FOR nLoopIndex := 1 TO N_NBR_MOVERS DO
+			aMovers[nLoopIndex].TargedStation := aStations[nIndexStationToMoveAferStart].LUID;
+		END_FOR
+		
+		// set opeationMode to Auto
+		PRG_Example_Station.setOpMode := E_OpMode.Auto;
+		
+		iXtsSystem.SuppressAllDynamicsChanges := FALSE;
+		bStart := FALSE;
+	END_IF
+END_IF	
+
+// 	continue the process after a disable - enable sequence
+IF bRestart THEN
+	bRestart := FALSE;
+	iXtsSystem.SuppressAllDynamicsChanges := FALSE;	
+	bAllStationsReady := TRUE;	
+	
+	FOR nLoopIndex := 1 TO N_NBR_MOVERS DO
+		// command the mover with the last command sent 
+		aMovers[nLoopIndex].MoveAbsCA(
+			fPosition	:= aMovers[nLoopIndex].ParentStation.PositionOnTrack, 
+			fVelocity 	:= aMovers[nLoopIndex].LastCmdTargedVelocity,  
+			fGap 		:= aMovers[nLoopIndex].LastCmdTargedGap,  
+			eDirection 	:= Tc3_Mc3Definitions.MC_DIRECTION.mcDirectionPositive);
+	END_FOR
+	
+	// set opeationMode to Auto
+	PRG_Example_Station.setOpMode := E_OpMode.Auto;
+END_IF
+
+// set Calibration
+IF bCalibration THEN
+	bCalibration := FALSE;
+	PRG_Example_Station.setOpMode := E_OpMode.Calibration;
+END_IF
+
+//Configure AND Start Simulation
+IF bStartSimulation THEN
+	bStartSimulation := FALSE;
+	iXtsSystem.SuppressAllDynamicsChanges := FALSE;	//Enable to adjust Gap + Dynamic depending on Station
+	
+	iXtsSystem.Station('Loading').	SimulationMode(1.0, 'Mounting');
+//	iXtsSystem.Station('Loading').	SimulationMode(0.5, 'Calibration');
+//	iXtsSystem.Station('Mounting').	SimulationMode(0.5, 'Unloading');
+	iXtsSystem.Station('Unloading').	SimulationMode(1.0, 'Loading');
+END_IF
+
+// Stop Simulation
+IF bStopSimulation THEN
+	bStopSimulation := FALSE;
+	FOR nLoopIndex := 1 TO N_NBR_STATIONS DO
+		aStations[nLoopIndex].SimulationMode(0,'');
+	END_FOR	
+	
+END_IF
+
+/// replace this section with your Station logic
+/// wait for movers, do your process, send the movers to station in front
+IF iXtsSystem.Enabled AND bAllStationsReady THEN
+	iXtsSystem.SuppressAllDynamicsChanges := FALSE;		
+	FOR nLoopIndex := 1 TO N_NBR_STATIONS DO
+		//In this aplicationexample, this is an waitingstation
+		bWaitingStation := (FIND(aStations[nLoopIndex].LUID,'wait')>0) OR (FIND(aStations[nLoopIndex].LUID,'Wait')>0);		
+		//Start process if all movers are in station
+		IF aStations[nLoopIndex].AreMoversInPlace AND NOT bWaitingStation THEN
+			;
+		END_IF
+		//Mover is in station and process is done
+		IF PRG_Example_Station.fbStationCalib.State = E_StationProcessState.ProcessDone THEN
+			//get next station in flow direction who has QueueSize >0 and is not defind as an waiting station(Queuesize >0 but no process)
+			iStation := aStations[nLoopIndex].StationsAhead;
+			WHILE iStation.MoverQueueSize = 0 OR (FIND(iStation.LUID,'wait')>0) OR (FIND(iStation.LUID,'Wait')>0) DO
+				iStation := iStation.StationsAhead;
+			END_WHILE
+
+			//send mover in next station
+			//XtsSystem.Station(aStations[nLoopIndex].LUID).SendMoversToStation(iStation.LUID);			
+		END_IF	
+	END_FOR
+END_IF
+
+
+// Changing of Gap Mode for Group (including Control Direction!)
+// changes control direction to positiv and mode to fast
+IF bFast AND iXtsSystem.Disabled THEN
+	bFast := FALSE;
+	fbGroup.ChangeGapMode(bFast:= TRUE);
+END_IF
+
+	
+// changes mode to standard and control direction to both
+IF bStandard AND iXtsSystem.Disabled THEN
+	bStandard := FALSE;
+	fbGroup.ChangeGapMode(bFast:= FALSE);
+END_IF
+
+PRG_Example_ProductData();
+PRG_Example_Station();
+
+//Update system at the end
+fbSystem.Update();
+
+//read command history
+refCommandHistory REF= fbSystem.Environment.UtilityEnvirement.XpuTcIo(1).MoverTcIo(1).P_CommandHistory;
+
+//IF XtsSystem.Station('Mounting').AreMoversInPlace THEN
+//	XtsSystem.Station('Mounting').MoversInQueue[0].FullAccess.MoveAbsCA(2050,200,500,Tc3_Mc3Definitions.MC_DIRECTION.mcDirectionShortestWay);
+//END_IF
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

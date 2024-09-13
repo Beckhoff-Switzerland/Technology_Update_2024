@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.2.0.0" ProductVersion="3.1.4024.13">
+  <POU Name="FB_N1_OEEDashboard" Id="{e360ce4a-14cb-4b68-9004-a6bd94af6bf7}" SpecialFunc="None">
+    <Declaration><![CDATA[//Analytics Network "OEEDashboard" with ID: 1
+{attribute 'no_assign'}
+FUNCTION_BLOCK FB_N1_OEEDashboard
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage := fbTcMsgSuccess;
+END_VAR
+VAR
+	fbTcMsgSuccess: FB_TcMessageSuccess;
+	
+	//Modules
+	fbM1_State_Unit: FB_N1_M1_State_Unit;
+	fbM2_State_Execute: FB_N1_M2_State_Execute;
+	fbM3_State_Aborted: FB_N1_M3_State_Aborted;
+	fbM4_State_Stopped: FB_N1_M4_State_Stopped;
+	fbM5_Time_Scheduled: FB_N1_M5_Time_Scheduled;
+	fbM6_OverallEquipmentEffectivenessOEE: FB_N1_M6_OverallEquipmentEffectivenessOEE;
+	fbM7_MachineLearningCalculationDuration: FB_N1_M7_MachineLearningCalculationDuration;
+	//SubNetworks
+	fbN2_Products_Produced: FB_N2_Products_Produced;
+	fbN3_Products_Defective: FB_N3_Products_Defective;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="{50cf6410-843e-4f27-8658-a2c9c7d28760}">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	pAnalysis: POINTER TO FB_Analysis;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+ValueMapping(pAnalysis);
+
+//New Lambda Function
+fbM1_State_Unit.Call(pAnalysis^.nContext);
+
+//The Timing Analysis 1Ch measures time difference between on- and off-periods and counts the amount of on-periods. The on-period starts when the condition of operator and threshold is met. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM2_State_Execute.Call(pAnalysis^.nContext);
+
+//The Timing Analysis 1Ch measures time difference between on- and off-periods and counts the amount of on-periods. The on-period starts when the condition of operator and threshold is met. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM3_State_Aborted.Call(pAnalysis^.nContext);
+
+//The Timing Analysis 1Ch measures time difference between on- and off-periods and counts the amount of on-periods. The on-period starts when the condition of operator and threshold is met. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM4_State_Stopped.Call(pAnalysis^.nContext);
+
+//The Timespan Operation executes a mathematical operation on two or more different input timespans and provides the result of the mathematical operation. The operator can be configured individually. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM5_Time_Scheduled.nTimeInCh1:= fbM2_State_Execute.fbTimeOnTotal.nRaw;
+fbM5_Time_Scheduled.nTimeInCh2:= fbM3_State_Aborted.fbTimeOnTotal.nRaw;
+fbM5_Time_Scheduled.nTimeInCh3:= fbM4_State_Stopped.fbTimeOnTotal.nRaw;
+fbM5_Time_Scheduled.Call(pAnalysis^.nContext);
+
+//Analytics Network "Products_Produced" with ID: 2
+fbN2_Products_Produced.Call(pAnalysis);
+
+//Analytics Network "Products_Defective" with ID: 3
+fbN3_Products_Defective.Call(pAnalysis);
+
+//The Overall Equipment Effectiveness (OEE) algorithm calculates key values to compare the current manufacturing process with its full potential. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM6_OverallEquipmentEffectivenessOEE.tScheduledTime:= fbM5_Time_Scheduled.fbTimespanResult.nRaw;
+fbM6_OverallEquipmentEffectivenessOEE.tOperatingTime:= fbM2_State_Execute.fbTimeOnTotal.nRaw;
+fbM6_OverallEquipmentEffectivenessOEE.nUnitsProduced:= fbN2_Products_Produced.nTotalCount;
+fbM6_OverallEquipmentEffectivenessOEE.nDefectiveUnits:= fbN3_Products_Defective.nTotalCount;
+fbM6_OverallEquipmentEffectivenessOEE.Call(pAnalysis^.nContext);
+
+//The Min Max Avg 1Ch calculates minimum, maximum and average values of the input values from the beginning of the analysis up to the current moment. Furthermore the time values of the minimum and maximum are shown. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM7_MachineLearningCalculationDuration.Call(pAnalysis^.nContext);
+
+
+//Error Handling
+IF fbM1_State_Unit.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM1_State_Unit.ipTcResult;
+ELSIF fbM2_State_Execute.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM2_State_Execute.ipTcResult;
+ELSIF fbM3_State_Aborted.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM3_State_Aborted.ipTcResult;
+ELSIF fbM4_State_Stopped.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM4_State_Stopped.ipTcResult;
+ELSIF fbM5_Time_Scheduled.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM5_Time_Scheduled.ipTcResult;
+ELSIF fbN2_Products_Produced.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbN2_Products_Produced.ipTcResult;
+ELSIF fbN3_Products_Defective.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbN3_Products_Defective.ipTcResult;
+ELSIF fbM6_OverallEquipmentEffectivenessOEE.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM6_OverallEquipmentEffectivenessOEE.ipTcResult;
+ELSIF fbM7_MachineLearningCalculationDuration.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM7_MachineLearningCalculationDuration.ipTcResult;
+ELSE
+	bError:= FALSE;
+	ipTcResult:= fbTcMsgSuccess;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{d2a759c6-f425-4009-a0b9-6a9ed500d964}">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+	bResult: BOOL := TRUE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bResult:= bResult AND fbM1_State_Unit.Reset();
+bResult:= bResult AND fbM2_State_Execute.Reset();
+bResult:= bResult AND fbM3_State_Aborted.Reset();
+bResult:= bResult AND fbM4_State_Stopped.Reset();
+bResult:= bResult AND fbM5_Time_Scheduled.Reset();
+bResult:= bResult AND fbN2_Products_Produced.Reset();
+bResult:= bResult AND fbN3_Products_Defective.Reset();
+bResult:= bResult AND fbM6_OverallEquipmentEffectivenessOEE.Reset();
+bResult:= bResult AND fbM7_MachineLearningCalculationDuration.Reset();
+Reset:= bResult;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ValueMapping" Id="{1f177399-c444-4e4a-8889-8458282a94df}">
+      <Declaration><![CDATA[METHOD PRIVATE ValueMapping : BOOL
+VAR_INPUT
+	pAnalysis: POINTER TO FB_Analysis;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Module fbM1_State_Unit
+fbM1_State_Unit.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;
+fbM1_State_Unit.nInput:= pAnalysis^.ipVirtual_Input_Source.nV1_nState;
+
+
+//Module fbM2_State_Execute
+fbM2_State_Execute.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;
+fbM2_State_Execute.nDataIn:= pAnalysis^.ipVirtual_Input_Source.nV1_nState;
+
+
+//Module fbM3_State_Aborted
+fbM3_State_Aborted.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;
+fbM3_State_Aborted.nDataIn:= pAnalysis^.ipVirtual_Input_Source.nV1_nState;
+
+
+//Module fbM4_State_Stopped
+fbM4_State_Stopped.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;
+fbM4_State_Stopped.nDataIn:= pAnalysis^.ipVirtual_Input_Source.nV1_nState;
+
+
+//Module fbM6_OverallEquipmentEffectivenessOEE
+fbM6_OverallEquipmentEffectivenessOEE.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;
+
+//Module fbM7_MachineLearningCalculationDuration
+fbM7_MachineLearningCalculationDuration.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;
+fbM7_MachineLearningCalculationDuration.nDataIn:= pAnalysis^.ipVirtual_Input_Source.nV1_tMlCalculation;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_N1_OEEDashboard">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_N1_OEEDashboard.Call">
+      <LineId Id="3" Count="68" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_N1_OEEDashboard.Reset">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_N1_OEEDashboard.ValueMapping">
+      <LineId Id="3" Count="25" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

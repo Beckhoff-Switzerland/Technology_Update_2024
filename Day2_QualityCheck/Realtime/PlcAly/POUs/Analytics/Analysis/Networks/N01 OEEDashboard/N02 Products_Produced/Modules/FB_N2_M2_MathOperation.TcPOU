@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_N2_M2_MathOperation" Id="06d45377-8762-4bfd-bc16-fefdd0f526f8" SpecialFunc="None">
+    <Declaration><![CDATA[//The Math Operation executes a mathematical operation on two or more different input channels and provides the result of the mathematical operation. The operator can be configured individually. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+FUNCTION_BLOCK FB_N2_M2_MathOperation
+VAR_INPUT
+	nDataInCh1: ULINT; 
+	fDataInCh2: LREAL; 
+	bEnableExecution: BOOL := TRUE; 
+	bReset: BOOL; 
+	bReconfigure: BOOL := TRUE;
+END_VAR
+VAR_INPUT PERSISTENT
+	eMathOperator: E_ALY_MathOperator; 
+	bUseAbsValues: BOOL; 
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+	bNewResult: BOOL;
+	fResult: LREAL;
+END_VAR
+VAR
+	
+	R_TRIG_Reconfigure: R_TRIG;
+	
+	fbALY_MathOperation: FB_ALY_MathOperation(nNumChannels:=2);
+END_VAR
+VAR PERSISTENT
+	bConfigured: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="62d3b98d-7742-436f-8a5f-34d7c24a939f">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	nCurrentContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bConfigured THEN
+	bConfigured:= TRUE;
+
+	eMathOperator:= E_ALY_MathOperator.Subtraction;
+	bUseAbsValues:= FALSE;
+
+END_IF
+
+R_TRIG_Reconfigure(CLK:= bReconfigure);
+IF R_TRIG_Reconfigure.Q THEN
+	fbALY_MathOperation.Configure(eMathOperator:= eMathOperator, bUseAbsValues:= bUseAbsValues);
+
+	bReconfigure:= FALSE;
+END_IF
+
+IF bReset THEN
+	Reset();
+END_IF
+
+IF bEnableExecution THEN
+	IF F_HasContext(nCurrentContext, nContext) THEN
+		fbALY_MathOperation.SetChannelValue(nChannel:= 1, Input:= nDataInCh1);
+		fbALY_MathOperation.SetChannelValue(nChannel:= 2, Input:= fDataInCh2);
+
+		fbALY_MathOperation.Call();
+
+
+		bNewResult:= fbALY_MathOperation.bNewResult;
+		fResult:= fbALY_MathOperation.fResult;
+
+		bError:= fbALY_MathOperation.bError;
+		ipTcResult:= fbALY_MathOperation.ipResultMessage;
+	END_IF
+ELSE
+	bNewResult:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="90c2b74c-a14d-4924-885a-ff1e7b8b74f6">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Reset:= fbALY_MathOperation.Reset();
+
+bNewResult:= fbALY_MathOperation.bNewResult;
+fResult:= fbALY_MathOperation.fResult;
+
+bError:= NOT Reset;
+ipTcResult:= fbALY_MathOperation.ipResultMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="3dd8d595-f683-4b7e-a94a-84eb996970cd">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="f73a5978-13c3-4711-b93c-4aebd9d28c1b">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= E_VirtualInput.eContext_V1_Virtual_Input_Source;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

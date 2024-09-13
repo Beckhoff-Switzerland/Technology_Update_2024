@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.2.0.0" ProductVersion="3.1.4024.13">
+  <POU Name="FB_N3_Products_Defective" Id="{a9fc51e6-da64-4eff-a84d-f6433e31c466}" SpecialFunc="None">
+    <Declaration><![CDATA[//Analytics Network "Products_Defective" with ID: 3
+{attribute 'no_assign'}
+FUNCTION_BLOCK FB_N3_Products_Defective
+VAR_INPUT
+	nOngoingCount: ULINT;
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage := fbTcMsgSuccess;
+	nTotalCount: ULINT;
+END_VAR
+VAR
+	fbTcMsgSuccess: FB_TcMessageSuccess;
+	
+	//Modules
+	fbM1_BatchNShift1Ch: FB_N3_M1_BatchNShift1Ch;
+	fbM2_MathOperation: FB_N3_M2_MathOperation;
+	fbM3_EdgeCounter1Ch: FB_N3_M3_EdgeCounter1Ch;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="{c75167dd-bc5e-4f44-a512-9d128eb5645c}">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	pAnalysis: POINTER TO FB_Analysis;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+ValueMapping(pAnalysis);
+
+//The BatchNShift 1Ch buffers input values with the configured buffer size and buffer mode.
+fbM1_BatchNShift1Ch.Call(pAnalysis^.nContext);
+
+//The Math Operation executes a mathematical operation on two or more different input channels and provides the result of the mathematical operation. The operator can be configured individually. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM2_MathOperation.fDataInCh2:= fbM1_BatchNShift1Ch.aOutputValues[2];
+fbM2_MathOperation.Call(pAnalysis^.nContext);
+
+//The Edge Counter 1Ch counts the amount of raised events. An event is raised when the signal of the input channel passes the configured edge at a specific threshold. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+fbM3_EdgeCounter1Ch.fDataIn:= fbM2_MathOperation.fResult;
+fbM3_EdgeCounter1Ch.Call(pAnalysis^.nContext);
+
+//Networkoutput mapping
+nTotalCount:= fbM3_EdgeCounter1Ch.nCount;
+
+
+//Error Handling
+IF fbM1_BatchNShift1Ch.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM1_BatchNShift1Ch.ipTcResult;
+ELSIF fbM2_MathOperation.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM2_MathOperation.ipTcResult;
+ELSIF fbM3_EdgeCounter1Ch.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbM3_EdgeCounter1Ch.ipTcResult;
+ELSE
+	bError:= FALSE;
+	ipTcResult:= fbTcMsgSuccess;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{a7e0c9c4-1cf5-4f52-801b-5e41863b7c82}">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+	bResult: BOOL := TRUE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bResult:= bResult AND fbM1_BatchNShift1Ch.Reset();
+bResult:= bResult AND fbM2_MathOperation.Reset();
+bResult:= bResult AND fbM3_EdgeCounter1Ch.Reset();
+Reset:= bResult;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ValueMapping" Id="{07120f42-8d3a-49d2-9c69-4633b574a35f}">
+      <Declaration><![CDATA[METHOD PRIVATE ValueMapping : BOOL
+VAR_INPUT
+	pAnalysis: POINTER TO FB_Analysis;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Networkinput mapping
+nOngoingCount:= pAnalysis^.ipVirtual_Input_Source.nV1_nDefectiveUnits;
+
+//Module fbM1_BatchNShift1Ch
+fbM1_BatchNShift1Ch.nDataIn:= nOngoingCount;
+
+//Module fbM2_MathOperation
+fbM2_MathOperation.nDataInCh1:= nOngoingCount;
+
+//Module fbM3_EdgeCounter1Ch
+fbM3_EdgeCounter1Ch.tTimestamp:= pAnalysis^.ipVirtual_Input_Source.tTimestamp;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_N3_Products_Defective">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_N3_Products_Defective.Call">
+      <LineId Id="3" Count="30" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_N3_Products_Defective.Reset">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_N3_Products_Defective.ValueMapping">
+      <LineId Id="3" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

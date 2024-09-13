@@ -1,0 +1,70 @@
+{
+    "ContentPermissionStore": {},
+    "KeyValueStore": {},
+    "LayoutStore": {
+        "__SystemAdministrator__OEE_Dashboard__OEE_Dashboard_ContentGrid__0": {
+            "LayoutHash": [
+                {
+                    "CType": "TcHmi.Controls.Analytics.SingleValue",
+                    "Cnt": 1
+                },
+                {
+                    "CType": "TcHmi.Controls.Analytics.OEE",
+                    "Cnt": 1
+                },
+                {
+                    "CType": "TcHmi.Controls.Analytics.AverageChart",
+                    "Cnt": 1
+                },
+                {
+                    "CType": "",
+                    "Cnt": 1
+                }
+            ],
+            "LayoutID": "__SystemAdministrator__OEE_Dashboard__OEE_Dashboard_ContentGrid__0",
+            "LayoutValue": [
+                {
+                    "cE": 3,
+                    "cS": 1,
+                    "id": "State_Unit_GridElement",
+                    "rE": 3,
+                    "rS": 1,
+                    "vis": true
+                },
+                {
+                    "cE": 3,
+                    "cS": 1,
+                    "id": "OverallEquipmentEffectivenessOEE_GridElement",
+                    "rE": 7,
+                    "rS": 3,
+                    "vis": true
+                },
+                {
+                    "cE": 3,
+                    "cS": 1,
+                    "id": "MachineLearningCalculationDuration_GridElement",
+                    "rE": 15,
+                    "rS": 7,
+                    "vis": true
+                },
+                {
+                    "cE": 3,
+                    "cS": 1,
+                    "id": "grid-buffer-cell-id",
+                    "rE": 3,
+                    "rS": 1,
+                    "vis": false
+                }
+            ]
+        }
+    },
+    "UserLayoutStore": {
+        "__SystemAdministrator__OEE_Dashboard__OEE_Dashboard_ContentGrid__0": {
+            "ContentID": "OEE_Dashboard",
+            "DisplayMode": "SMARTPHONE",
+            "LayoutID": "__SystemAdministrator__OEE_Dashboard__OEE_Dashboard_ContentGrid__0",
+            "UserID": "__SystemAdministrator",
+            "UserLayoutID": "__SystemAdministrator__OEE_Dashboard__OEE_Dashboard_ContentGrid__0"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="max_abs_array" Id="{09302b30-6778-4f22-a27d-96350aa85cf1}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION max_abs_array : LREAL
+VAR_IN_OUT
+	aData : ARRAY[*] OF LREAL;
+END_VAR
+VAR
+	nIdx: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[max_abs_array := 0;
+FOR nIdx := LOWER_BOUND(aData,1) TO UPPER_BOUND(aData,1) DO
+	max_abs_array := MAX(ABS(aData[nIdx]),max_abs_array);
+END_FOR]]></ST>
+    </Implementation>
+    <LineIds Name="max_abs_array">
+      <LineId Id="61" Count="2" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

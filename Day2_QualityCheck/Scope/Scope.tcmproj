@@ -1,0 +1,22 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{af6efb30-7ca8-4940-b817-68238cfba7ed}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>
+    <Name>Scope</Name>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="ImageCounter.tcscopex">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="OEE.tcAlyProj">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Timeout.tcscopex">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+</Project>

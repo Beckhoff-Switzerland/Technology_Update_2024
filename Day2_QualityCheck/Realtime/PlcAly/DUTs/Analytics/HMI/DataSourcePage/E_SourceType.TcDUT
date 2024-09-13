@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="E_SourceType" Id="2e0b87a5-7110-44ef-83fa-7746ca338a73">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_SourceType : 
+(
+	eLive := 0,
+	eHistMQTT,
+	eHistFile
+) ;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

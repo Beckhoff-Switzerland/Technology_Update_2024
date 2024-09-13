@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="E_VirtualInput" Id="48ff6768-54be-42bb-82f1-20d3ce55246c">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+TYPE E_VirtualInput : 
+(
+	eContext_No := 0, 
+	eContext_V1_Virtual_Input_Source := 2#0000_0000_0000_0001_0000_0000_0000_0000, //Virtual_Input_Source
+	eContext_Vn_Reserve1 := 2#0000_0000_0000_0010_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve2 := 2#0000_0000_0000_0100_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve3 := 2#0000_0000_0000_1000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve4 := 2#0000_0000_0001_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve5 := 2#0000_0000_0010_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve6 := 2#0000_0000_0100_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve7 := 2#0000_0000_1000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve8 := 2#0000_0001_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve9 := 2#0000_0010_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve10 := 2#0000_0100_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve11 := 2#0000_1000_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve12 := 2#0001_0000_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve13 := 2#0010_0000_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve14 := 2#0100_0000_0000_0000_0000_0000_0000_0000, //Reserve
+	eContext_Vn_Reserve15 := 2#1000_0000_0000_0000_0000_0000_0000_0000 //Reserve
+) DWORD;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

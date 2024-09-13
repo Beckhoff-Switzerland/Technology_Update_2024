@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="E_DataSourceContext" Id="61222123-b117-4c91-a09d-4297b612d553">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+TYPE E_DataSourceContext : 
+(
+	eContext_No := 0, 
+	eContext_Unknown := 2#0000_0000_0000_0001, //Unknown - All contexts allowed
+	eContext_1000 := 2#0000_0000_0000_0010, //1000 µs
+	eContext_Reserve1 := 2#0000_0000_0000_0100, //Reserve
+	eContext_Reserve2 := 2#0000_0000_0000_1000, //Reserve
+	eContext_Reserve3 := 2#0000_0000_0001_0000, //Reserve
+	eContext_Reserve4 := 2#0000_0000_0010_0000, //Reserve
+	eContext_Reserve5 := 2#0000_0000_0100_0000, //Reserve
+	eContext_Reserve6 := 2#0000_0000_1000_0000, //Reserve
+	eContext_Reserve7 := 2#0000_0001_0000_0000, //Reserve
+	eContext_Reserve8 := 2#0000_0010_0000_0000, //Reserve
+	eContext_Reserve9 := 2#0000_0100_0000_0000, //Reserve
+	eContext_Reserve10 := 2#0000_1000_0000_0000, //Reserve
+	eContext_Reserve11 := 2#0001_0000_0000_0000, //Reserve
+	eContext_Reserve12 := 2#0010_0000_0000_0000, //Reserve
+	eContext_Reserve13 := 2#0100_0000_0000_0000, //Reserve
+	eContext_Reserve14 := 2#1000_0000_0000_0000 //Reserve
+) DWORD;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

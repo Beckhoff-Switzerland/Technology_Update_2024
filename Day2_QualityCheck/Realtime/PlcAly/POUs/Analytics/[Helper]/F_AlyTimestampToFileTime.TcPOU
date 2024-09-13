@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_AlyTimestampToFileTime" Id="64fb2043-ff92-46d1-b213-68fe72690078" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_AlyTimestampToFileTime : ULINT
+VAR_INPUT
+	tTimestamp: ULINT;
+END_VAR
+VAR
+	tFileTime: T_FILETIME;
+	
+	fbToUTC: FB_TzSpecificLocalTimeToFileTime;
+	//W. Europe Daylight Time
+	//(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna
+	tzInfo: ST_TimeZoneInformation := (bias := -60, standardDate := (wMonth := 10 ,wDay:=5, wHour := 3), daylightDate := (wMonth := 3, wDay:=5, wHour := 2), daylightBias := -60);
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[tFileTime:= DCTIME64_TO_Filetime(tTimestamp);
+
+fbToUTC(in:= tFileTime, tzInfo:= tzInfo);
+F_AlyTimestampToFileTime:= ULARGE_TO_ULINT(ULARGE_INTEGER(fbToUTC.out.dwHighDateTime, fbToUTC.out.dwLowDateTime));]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

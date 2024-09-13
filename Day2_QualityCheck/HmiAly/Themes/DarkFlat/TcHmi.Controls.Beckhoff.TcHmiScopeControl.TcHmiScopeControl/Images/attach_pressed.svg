@@ -1,0 +1,15 @@
+<svg id="pfade" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #a3b0bb;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M39.59568,28.198l7.099-7.0992a8.62158,8.62158,0,0,1,12.1928,12.1927L46.69518,45.4836a8.62211,8.62211,0,0,1-14.6486-5.0049"/>
+  <path class="cls-1" d="M40.27608,51.9716l-7.099,7.0992a8.62154,8.62154,0,0,1-12.1927-12.1927L33.17658,34.686a8.62211,8.62211,0,0,1,14.6486,5.0049"/>
+</svg>

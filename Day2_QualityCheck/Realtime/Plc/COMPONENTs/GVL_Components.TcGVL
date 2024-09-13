@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <GVL Name="GVL_Components" Id="{a65a6109-e8ab-4760-bc8a-9f6c5ab8d822}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	{attribute 'TcContextId':='0'}
+	fbMachine : FB_Machine; // Process cell
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

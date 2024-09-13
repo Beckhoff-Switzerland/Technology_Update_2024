@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_FileTimeToDCTimestruct" Id="056a7b8e-bca4-4d8a-9c8a-225af0927bef" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_FileTimeToDCTimestruct : DCTIMESTRUCT
+VAR_INPUT
+	tTimestamp: ULINT;
+END_VAR
+VAR
+	tULarge: T_ULARGE_INTEGER;
+	tFileTime: T_FILETIME;
+	newDCTime: T_DCTIME64;
+	
+	fbToLocal: FB_FileTimeToTzSpecificLocalTime;
+	//W. Europe Daylight Time
+	//(UTC+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna
+	tzInfo: ST_TimeZoneInformation := (bias := -60, standardDate := (wMonth := 10 ,wDay:=5, wHour := 3), daylightDate := (wMonth := 3, wDay:=5, wHour := 2), daylightBias := -60);
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[tULarge:= ULINT_TO_ULARGE(tTimestamp);
+tFileTime.dwLowDateTime:= tULarge.dwLowPart;
+tFileTime.dwHighDateTime:= tULarge.dwHighPart;
+
+fbToLocal(in:= tFileTime, tzInfo:= tzInfo);
+newDCTime:= FILETIME_TO_DCTIME64(fbToLocal.out);
+
+F_FileTimeToDCTimestruct:= DCTIME64_TO_DCTIMESTRUCT(newDCTime);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

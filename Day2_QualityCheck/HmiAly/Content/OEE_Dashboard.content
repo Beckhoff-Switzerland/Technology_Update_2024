@@ -1,0 +1,167 @@
+<div id="OEE_Dashboard" data-tchmi-type="TcHmi.Controls.System.TcHmiContent" data-tchmi-top="0" data-tchmi-left="0" data-tchmi-width="100" data-tchmi-height="100" data-tchmi-height-mode="Value" data-tchmi-width-mode="Value" data-tchmi-width-unit="%" data-tchmi-height-unit="%" data-tchmi-creator-viewport-width="1900" data-tchmi-creator-viewport-height="1725" class="tchmi-analytics-network-content">
+
+<script data-tchmi-target-attribute="data-tchmi-trigger" type="application/json">[{"event":"OEE_Dashboard.onAttached","actions":[{"objectType":"WriteToSymbol","active":true,"symbolExpression":"%i%currentResetVariable%/i%","valueType":"tchmi:general#/definitions/String","value":{"objectType":"StaticValue","valueType":"tchmi:general#/definitions/String","value":"PLC1.AnalyticsHMI.bN1_OEEDashboard_Reset"},"asyncWait":true}]}]</script><div id="OEE_Dashboard_ContentGrid" data-tchmi-type="TcHmi.Controls.Analytics.LayoutManager" data-tchmi-mobile-view-width="600" data-tchmi-column-number="%ctrl%TcHmiMenu::ColumnNumber%/ctrl%" data-tchmi-default-control-distance="%ctrl%TcHmiMenu::DefaultControlDistance%/ctrl%" data-tchmi-monitor-view-width="1000" data-tchmi-ctrl-alias="CTRL" data-tchmi-is-analytics-use="True" data-tchmi-allow-layout-edit="true" data-tchmi-lock-controls="false" data-tchmi-use-custom-row-height="false" data-tchmi-custom-row-height="50" data-tchmi-layout-store-success-alias="%l%LMLayoutStoreSuccess%/l%" data-tchmi-layout-store-failed-alias="%l%LMLayoutStoreFailed%/l%" data-tchmi-layout-store-cancel-alias="Cancel saving because the dashboard is currently being edited." data-tchmi-layout-exit-cancel-alias="Exit editing canceled because the dashboard is currently being edited." data-tchmi-width="98" data-tchmi-height="98" data-tchmi-left="1" data-tchmi-top="10" class="tchmi-analytics-network-content-grid" data-tchmi-width-mode="Value" data-tchmi-height-mode="Value" data-tchmi-width-unit="%" data-tchmi-height-unit="%" data-tchmi-left-unit="%" data-tchmi-top-unit="px" data-tchmi-default-viewport-width="1900" data-tchmi-default-viewport-height="1725" data-tchmi-menu-control-symbol="%ctrl%TcHmiMenu%/ctrl%">
+
+<script data-tchmi-target-attribute="data-tchmi-default-layout" type="application/json">[{"cS":5,"cE":13,"rS":1,"rE":5,"id":"OverallEquipmentEffectivenessOEE","vis":true,"type":"TcHmi.Controls.Analytics.OEE"},{"cS":13,"cE":17,"rS":1,"rE":5,"id":"MachineLearningCalculationDuration","vis":true,"type":"TcHmi.Controls.Analytics.AverageChart"},{"cS":17,"cE":19,"rS":1,"rE":3,"id":"State_Unit","vis":true,"type":"TcHmi.Controls.Analytics.SingleValue"}]</script><div id="State_Unit" data-tchmi-type="TcHmi.Controls.Analytics.SingleValue" data-tchmi-show-title="%i%showTitleEnable%/i%" data-tchmi-name-alias="%l%module_state_unit%/l%" data-tchmi-color-gradient="%i%ColorGradientControls%/i%" data-tchmi-font-size-title="16" data-tchmi-amount-decimals="2" data-tchmi-show-edit-properties="true" data-tchmi-edit-properties-alias="%l%ACEditProperties%/l%" data-tchmi-show-reset="%i%resetCtrlsEnable%/i%" data-tchmi-value="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl3_State_Unit.sM1_sOutput%/s%" data-tchmi-unit="" data-tchmi-show-last-event="false" data-tchmi-last-event-alias="%l%LastEvent%/l%" data-tchmi-month-alias="%l%Months%/l%" data-tchmi-show-milli-seconds="false" data-tchmi-width="8.055854" data-tchmi-height="8.873115" data-tchmi-left="76.7894745" data-tchmi-top="0.5797101" class="TcHmi_Controls_AlyHMI_AnalyticsControl" data-tchmi-reset="%s%PLC1.AnalyticsHMI.bN1_M1_State_Unit_Reset%/s%" data-tchmi-left-unit="%" data-tchmi-top-unit="%" data-tchmi-width-unit="%" data-tchmi-height-unit="%">
+
+<script data-tchmi-target-attribute="data-tchmi-lastevent" type="application/json">
+{
+  "wYear": 1900,
+  "wMonth": 1,
+  "wDayOfWeek": 1,
+  "wDay": 1,
+  "wHour": 12,
+  "wMinute": 0,
+  "wSecond": 0,
+  "wMilliseconds": 0,
+  "wMicroseconds": 0,
+  "wNanoseconds": 0
+}
+</script><script data-tchmi-target-attribute="data-tchmi-class-names" type="application/json">["Default"]</script><script data-tchmi-target-attribute="data-tchmi-access-config" type="application/json">[
+  {
+    "group": "Administrators",
+    "accessright": "operate",
+    "permission": "Allow"
+  },
+  {
+    "group": "Administrators",
+    "accessright": "observe",
+    "permission": "Allow"
+  },
+  {
+    "group": "Users",
+    "accessright": "operate",
+    "permission": "Allow"
+  },
+  {
+    "group": "Users",
+    "accessright": "observe",
+    "permission": "Allow"
+  },
+  {
+    "group": "Guests",
+    "accessright": "operate",
+    "permission": "Deny"
+  },
+  {
+    "group": "Guests",
+    "accessright": "observe",
+    "permission": "Allow"
+  }
+]</script></div><div id="OverallEquipmentEffectivenessOEE" data-tchmi-type="TcHmi.Controls.Analytics.OEE" data-tchmi-show-title="%i%showTitleEnable%/i%" data-tchmi-name-alias="%l%module_overall_equipment_effectiveness__oee_%/l%" data-tchmi-color-gradient="%i%ColorGradientControls%/i%" data-tchmi-font-size-title="16" data-tchmi-amount-decimals="2" data-tchmi-show-edit-properties="true" data-tchmi-edit-properties-alias="%l%ACEditProperties%/l%" data-tchmi-show-reset="%i%resetCtrlsEnable%/i%" data-tchmi-oee-design="Default" data-tchmi-oee="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fOEE%/s%" data-tchmi-availability="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fAvailability%/s%" data-tchmi-performance="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fPerformance%/s%" data-tchmi-quality="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fQuality%/s%" data-tchmi-level-ok-warning="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fThresholdLevelOkWarning%/s%" data-tchmi-level-warning-alarm="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fThresholdLevelWarningAlarm%/s%" data-tchmi-classification="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.eM6_eOeeClass%/s%" data-tchmi-show-levels="true" data-tchmi-show-classification="true" data-tchmi-use-threshold-color="True" data-tchmi-oee-alias="%l%OEEOverallEquipmentEffectiveness%/l%" data-tchmi-oee-short-alias="%l%OEEOEE%/l%" data-tchmi-availability-alias="%l%OEEAvailability%/l%" data-tchmi-performance-alias="%l%OEEPerformance%/l%" data-tchmi-quality-alias="%l%OEEQuality%/l%" data-tchmi-width="33.8345871" data-tchmi-height="18.33777" data-tchmi-left="19.9473686" data-tchmi-top="0.5797101" class="TcHmi_Controls_AlyHMI_AnalyticsControl" data-tchmi-reset="%s%PLC1.AnalyticsHMI.bN1_M6_OverallEquipmentEffectivenessOEE_Reset%/s%" data-tchmi-left-unit="%" data-tchmi-top-unit="%" data-tchmi-width-unit="%" data-tchmi-height-unit="%">
+
+<script data-tchmi-target-attribute="data-tchmi-oee-color" type="application/json">
+{
+  "objectType": "SolidColor",
+  "color": "rgba(0, 200, 200, 1)"
+}
+</script>
+<script data-tchmi-target-attribute="data-tchmi-availability-color" type="application/json">
+{
+  "objectType": "SolidColor",
+  "color": "rgba(255, 0, 255, 1)"
+}
+</script>
+<script data-tchmi-target-attribute="data-tchmi-performance-color" type="application/json">
+{
+  "objectType": "SolidColor",
+  "color": "rgba(255, 255, 0, 1)"
+}
+</script>
+<script data-tchmi-target-attribute="data-tchmi-quality-color" type="application/json">
+{
+  "objectType": "SolidColor",
+  "color": "rgba(255, 99, 97, 1)"
+}
+</script><script data-tchmi-target-attribute="data-tchmi-class-names" type="application/json">["Default"]</script><script data-tchmi-target-attribute="data-tchmi-access-config" type="application/json">[
+  {
+    "group": "Administrators",
+    "accessright": "operate",
+    "permission": "Allow"
+  },
+  {
+    "group": "Administrators",
+    "accessright": "observe",
+    "permission": "Allow"
+  },
+  {
+    "group": "Users",
+    "accessright": "operate",
+    "permission": "Allow"
+  },
+  {
+    "group": "Users",
+    "accessright": "observe",
+    "permission": "Allow"
+  },
+  {
+    "group": "Guests",
+    "accessright": "operate",
+    "permission": "Deny"
+  },
+  {
+    "group": "Guests",
+    "accessright": "observe",
+    "permission": "Allow"
+  }
+]</script></div><div id="MachineLearningCalculationDuration" data-tchmi-type="TcHmi.Controls.Analytics.AverageChart" data-tchmi-show-title="%i%showTitleEnable%/i%" data-tchmi-name-alias="%l%module_machine_learning_calculation_duration%/l%" data-tchmi-color-gradient="%i%ColorGradientControls%/i%" data-tchmi-font-size-title="16" data-tchmi-amount-decimals="2" data-tchmi-show-edit-properties="true" data-tchmi-edit-properties-alias="%l%ACEditProperties%/l%" data-tchmi-show-reset="%i%resetCtrlsEnable%/i%" data-tchmi-min-alias="%l%Min%/l%" data-tchmi-max-alias="%l%Max%/l%" data-tchmi-avg-alias="%l%Avg%/l%" data-tchmi-actual-value-alias="%l%Value%/l%" data-tchmi-month-alias="%l%Months%/l%" data-tchmi-min="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.fM7_fMin%/s%" data-tchmi-max="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.fM7_fMax%/s%" data-tchmi-avg="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.fM7_fAvg%/s%" data-tchmi-actual-value="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.nM7_nDataIn%/s%" data-tchmi-show-actual-value="true" data-tchmi-show-milli-seconds="false" data-tchmi-show-last-events="true" data-tchmi-show-bounds-warning="true" data-tchmi-width="16.6487656" data-tchmi-height="18.33777" data-tchmi-left="57.8421059" data-tchmi-top="0.5797101" class="TcHmi_Controls_AlyHMI_AnalyticsControl" data-tchmi-lastmin="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.tM7_fbTimeMin%/s%" data-tchmi-lastmax="%s%PLC1.AnalyticsHMI.stHMI_C1_OEE_Dashboard.stHMI_C1_Ctrl2_Machine_Learning_Calculation_Duration.tM7_fbTimeMax%/s%" data-tchmi-reset="%s%PLC1.AnalyticsHMI.bN1_M7_MachineLearningCalculationDuration_Reset%/s%" data-tchmi-left-unit="%" data-tchmi-top-unit="%" data-tchmi-width-unit="%" data-tchmi-height-unit="%">
+
+<script data-tchmi-target-attribute="data-tchmi-lastmin" type="application/json">
+{
+  "wYear": 1900,
+  "wMonth": 1,
+  "wDayOfWeek": 1,
+  "wDay": 1,
+  "wHour": 12,
+  "wMinute": 0,
+  "wSecond": 0,
+  "wMilliseconds": 0,
+  "wMicroseconds": 0,
+  "wNanoseconds": 0
+}
+</script>
+<script data-tchmi-target-attribute="data-tchmi-lastmax" type="application/json">
+{
+  "wYear": 1900,
+  "wMonth": 1,
+  "wDayOfWeek": 1,
+  "wDay": 1,
+  "wHour": 12,
+  "wMinute": 0,
+  "wSecond": 0,
+  "wMilliseconds": 0,
+  "wMicroseconds": 0,
+  "wNanoseconds": 0
+}
+</script><script data-tchmi-target-attribute="data-tchmi-class-names" type="application/json">["Default"]</script><script data-tchmi-target-attribute="data-tchmi-access-config" type="application/json">[
+  {
+    "group": "Administrators",
+    "accessright": "operate",
+    "permission": "Allow"
+  },
+  {
+    "group": "Administrators",
+    "accessright": "observe",
+    "permission": "Allow"
+  },
+  {
+    "group": "Users",
+    "accessright": "operate",
+    "permission": "Allow"
+  },
+  {
+    "group": "Users",
+    "accessright": "observe",
+    "permission": "Allow"
+  },
+  {
+    "group": "Guests",
+    "accessright": "operate",
+    "permission": "Deny"
+  },
+  {
+    "group": "Guests",
+    "accessright": "observe",
+    "permission": "Allow"
+  }
+]</script></div></div></div>

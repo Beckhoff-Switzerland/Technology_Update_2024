@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="PRG_Example_ProductData" Id="{45386950-e978-4edb-a7de-82ec20958356}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_Example_ProductData
+VAR
+	bInitDone : BOOL;
+		
+	aProductsFormatA 	: ARRAY[0..(MAIN.N_NBR_MOVERS-1)] OF FB_ProductDataA;
+	fbProductsUnused 	: CHALET_BaseComponents.FB_CH_List; //In this example this list is used to transfer products to the XTS
+	fbProductsOnMover 	: CHALET_BaseComponents.FB_CH_List; //As long as the products are on the XTS, each of them can be reached via this list and the interface to the mover can also be requested.
+	
+	ipObject 			: I_CH_Object;
+	ipProductFormatA 	: I_ProductDataA;
+
+	ipStationLoad, ipStationModify, ipStationUnload : I_XTS_Station_PLC;
+	fbTriggerMoverInPlace1, fbTriggerMoverInPlace2, fbTriggerMoverInPlace3 : R_TRIG; 
+	
+	nIdx : UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bInitDone THEN
+	bInitDone := TRUE;
+	
+	//Put all product informations in a list to easy access them
+	FOR nIdx := 0 TO (MAIN.N_NBR_MOVERS-1) DO
+		fbProductsUnused.AddObject(aProductsFormatA[nIdx]);
+	END_FOR
+END_IF
+
+
+
+//Station A: put empty product info FB on mover
+ipStationLoad := MAIN.iXtsSystem.Station('Loading');
+//This is executed once when the mover arrives at the station
+fbTriggerMoverInPlace1(CLK:= ipStationLoad.AreMoversInPlace);
+IF fbTriggerMoverInPlace1.Q THEN
+	//Do this for each mover inside the station
+	FOR nIdx := 0 TO (ipStationLoad.MoverQueueSize-1) DO
+		
+		// Only execute if datacontainer on mover is empty
+		IF ipStationLoad.MoversInQueue[nIdx].ProductData = 0 THEN
+			
+			//Get an unused product OR handover here the product data from the previous process step here
+			ipObject := fbProductsUnused.GetRandomObject();
+			
+			//Remove an put in OnMovers List
+			fbProductsUnused.RemoveObject(ipObject);
+			fbProductsOnMover.AddObject(ipObject);
+			
+			
+			//Query whether the FB behind this instance implements the following interface and get it.
+			IF __QUERYINTERFACE(ipObject, ipProductFormatA) THEN		
+				//Store the interface in the Mover
+				ipStationLoad.MoversInQueue[nIdx].ProductData := ipProductFormatA; // <= one of the important steps. Everything else around is application specific
+			END_IF
+		
+		END_IF
+		
+
+	END_FOR
+END_IF
+
+
+//Station B: read/write product info 
+ipStationModify := MAIN.iXtsSystem.Station('Mounting');
+//This is executed once when the mover arrives at the station
+fbTriggerMoverInPlace2(CLK:= ipStationModify.AreMoversInPlace);
+IF fbTriggerMoverInPlace2.Q THEN
+	//Do this for each mover inside the station
+	FOR nIdx := 0 TO (ipStationModify.MoverQueueSize-1) DO
+		
+		//Query whether the FB behind this instance implements the following interface and get it.
+		IF __QUERYINTERFACE(ipStationModify.MoversInQueue[nIdx].ProductData, ipProductFormatA) THEN // <= one of the important steps. Everything else around is application specific
+			ipProductFormatA.Data.nQuality := (ipProductFormatA.Data.nQuality + 42)MOD 100;	
+			ipProductFormatA.Data.bGoodProduct := ipProductFormatA.Data.nQuality >= 80;
+		END_IF
+	
+	END_FOR
+END_IF
+
+
+
+//Station C: Remove Produkt from XTS
+ipStationUnload := MAIN.iXtsSystem.Station('Unloading');
+//This is executed once when the mover arrives at the station
+fbTriggerMoverInPlace3(CLK:= ipStationUnload.AreMoversInPlace);
+IF fbTriggerMoverInPlace3.Q THEN
+	//Do this for each mover inside the station
+	FOR nIdx := 0 TO (ipStationUnload.MoverQueueSize-1) DO
+		
+		//Query whether the FB behind this instance implements the following interface and get it.
+		IF __QUERYINTERFACE(ipStationUnload.MoversInQueue[nIdx].ProductData, ipObject) THEN
+			
+			//Handover to next processing unit OR in this case, put in UnusedList
+			fbProductsOnMover.RemoveObject(ipObject);
+			fbProductsUnused.AddObject(ipObject);
+		END_IF
+		
+		// Clear mover storage
+		ipStationUnload.MoversInQueue[nIdx].ProductData := 0; // <= one of the important steps. Everything else around is application specific
+	END_FOR
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

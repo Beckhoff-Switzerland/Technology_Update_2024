@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="MAIN_Analytics_C1" Id="9fbbaae5-95dd-4a61-9cf5-c468f74b3b69" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN_Analytics_C1
+VAR_INPUT
+	stReset: ST_AnalysisReset;
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+END_VAR
+VAR
+	nHMIUpdateState: INT;
+	bHMIReinit: BOOL := TRUE;
+	bHMIResetReinit: BOOL;
+	bHMIReinitDone: BOOL;
+	
+	fbV1_C1_Virtual_Input_Source: FB_V1_C1_Virtual_Input_Source(fbSource:= Analytics.fbT1_InputSource);
+	
+	fbAnalysis: FB_Analysis := ( nConfigurationID:= 1, 
+								ipVirtual_Input_Source:= fbV1_C1_Virtual_Input_Source );
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[A_Reset();
+
+fbV1_C1_Virtual_Input_Source.SourceSync();
+
+IF NOT fbV1_C1_Virtual_Input_Source.bEndOfData THEN
+
+	WHILE NOT fbV1_C1_Virtual_Input_Source.bEndOfData DO
+
+		fbV1_C1_Virtual_Input_Source.NextData(1);
+
+		fbAnalysis.Call();
+
+	END_WHILE
+
+ELSE
+	fbAnalysis.Call();
+END_IF
+
+fbV1_C1_Virtual_Input_Source.Done();
+
+//Error Handling
+bError:= fbAnalysis.bError;
+ipTcResult:= fbAnalysis.ipTcResult;
+
+
+//Map HMI Current Timestamp
+AnalyticsHMI.stHMI_DataSourceConfig[0].aInputSources[0].eState:= fbV1_C1_Virtual_Input_Source.fbInputSource.eDataState;
+AnalyticsHMI.stHMI_DataSourceConfig[0].aInputSources[0].dtTimestamp:= fbV1_C1_Virtual_Input_Source.dtTimestamp;]]></ST>
+    </Implementation>
+    <Action Name="A_Reset" Id="d45f8efc-e312-4cef-a436-e4738da98d73">
+      <Implementation>
+        <ST><![CDATA[
+//Reset Analytics Components
+fbAnalysis.Reset(stReset);
+
+Analytics.stReset.bResetExecute:= FALSE;]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="A_MapToHMI" Id="7ee08363-bb1f-4b9a-b3a8-eeb28a6fc6ac">
+      <Implementation>
+        <ST><![CDATA[
+//Map In-/Outputs of the Analysis to HMI Structs
+CASE nHMIUpdateState OF
+	0:
+		bHMIReinit:= bHMIReinit OR fbAnalysis.GetHMIValues(1, ADR(AnalyticsHMI.stHMI_C1_OEE_Dashboard));
+		bHMIReinitDone:= fbAnalysis.SetHMIValues(1, ADR(AnalyticsHMI.stHMI_C1_OEE_Dashboard), bHMIReinit);
+		nHMIUpdateState:= 1;
+	1:
+		IF bHMIResetReinit THEN
+			bHMIResetReinit:= FALSE;
+			bHMIReinit:= FALSE;
+		END_IF
+
+		IF bHMIReinitDone THEN
+			bHMIResetReinit:= TRUE;
+		END_IF
+
+		nHMIUpdateState:= 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Action>
+  </POU>
+</TcPlcObject>

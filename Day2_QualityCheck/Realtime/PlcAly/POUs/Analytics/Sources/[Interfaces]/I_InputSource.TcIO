@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <Itf Name="I_InputSource" Id="293b5cd5-5952-44aa-b662-e7c6220c0970">
+    <Declaration><![CDATA[INTERFACE I_InputSource]]></Declaration>
+    <Method Name="AddClient" Id="c76cbd4d-e83b-4674-8b63-6af844b97252">
+      <Declaration><![CDATA[METHOD AddClient : BOOL
+VAR_OUTPUT
+	nClientID: LWORD;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="Call" Id="2e2d85f4-e047-49cb-99d3-2b4a39bd7f6c">
+      <Declaration><![CDATA[METHOD Call : BOOL]]></Declaration>
+    </Method>
+    <Method Name="ClientDone" Id="ccf92939-19e4-4093-9335-0c55668ed081">
+      <Declaration><![CDATA[METHOD ClientDone : BOOL
+VAR_INPUT
+	nClientID: LWORD;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="GetData" Id="baf4caf4-3589-4638-88a0-a0ffec821886">
+      <Declaration><![CDATA[METHOD GetData : BOOL
+VAR_INPUT
+	nElement: UDINT;
+	pInputs: PVOID;
+	nInputsSize: UDINT;
+END_VAR
+VAR_OUTPUT
+	nTimestamp: ULINT;
+	nContext: DWORD;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="NewDataAvailable" Id="d1bdcccd-12a6-4dfd-a645-2135b447372c">
+      <Declaration><![CDATA[METHOD NewDataAvailable : BOOL
+VAR_INPUT
+	nLastDataHandle: ULINT;
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="eDataState" Id="a46b1c47-e3d3-4cb9-a821-f00ba9cdfe89">
+      <Declaration><![CDATA[PROPERTY eDataState : E_DataSourceState]]></Declaration>
+      <Get Name="Get" Id="31fea793-ee0c-438d-ab8a-0563fca3b225">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="bReadNewData" Id="0580f120-b66b-4924-b90b-688506dcb69a">
+      <Declaration><![CDATA[PROPERTY bReadNewData : BOOL]]></Declaration>
+      <Get Name="Get" Id="740125bc-639e-4713-8c33-aaa77be2250b">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="nDataHandle" Id="ed7a1c92-dc07-42a7-9bde-b63e29fe0729">
+      <Declaration><![CDATA[PROPERTY nDataHandle : ULINT]]></Declaration>
+      <Get Name="Get" Id="25936d2b-df69-4668-ae41-26562c231c49">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="nElements" Id="efd38ad4-c91e-456e-81d9-17108cac4ff1">
+      <Declaration><![CDATA[PROPERTY nElements : UDINT]]></Declaration>
+      <Get Name="Get" Id="a6b1bb94-88ec-42ff-882a-b1f8aaf577ab">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="nMaxOversamplingFactor" Id="bfbce384-26ea-4034-b8d8-902cfad24bb2">
+      <Declaration><![CDATA[PROPERTY nMaxOversamplingFactor : UDINT]]></Declaration>
+      <Get Name="Get" Id="852594e1-cf9a-4a1b-b2ef-68d59fc1bd74">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>

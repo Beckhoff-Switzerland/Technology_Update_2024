@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.2.0.0" ProductVersion="3.1.4024.13">
+  <POU Name="FB_V1_C1_Virtual_Input_Source" Id="{9a6257cd-c1e8-4e82-8d92-73bc8f8dbf80}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_V1_C1_Virtual_Input_Source IMPLEMENTS I_VirtualInputSource, I_V1_Virtual_Input_Source
+VAR
+	_fbSource: I_InputSource;
+	
+	_nSourceClientID: LWORD;
+	_nDataHandle: ULINT;
+	_nElements: UDINT;
+	
+	_nSelectedElement: UDINT;
+	_nSelectedOversample: UDINT;
+	
+	_nContext: DWORD;
+	_stInputs: ST_T1_Inputs;
+	
+	_nTimestamp: ULINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="I_V1_Virtual_Input_Source" Id="{efc72da7-a840-4c18-9a1b-93ce3ac4e1a4}" />
+    <Folder Name="I_VirtualInputSource" Id="{bb4f3988-481a-4578-816a-057dfc1780de}" />
+    <Property Name="bEndOfData" Id="{5a4d4dd8-e514-462b-bbe9-2121c90468f9}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[PROPERTY bEndOfData : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7d2674b7-e798-47c8-8c4a-7094fac53df9}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bEndOfData:= _nElements = 0 OR (_nSelectedElement >= _nElements AND _nSelectedOversample >= _fbSource.nMaxOversamplingFactor);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Done" Id="{77b24883-a059-45f4-8b35-6973e05288f8}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[METHOD Done : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bEndOfData AND _nElements > 0 THEN
+	_nElements:= 0;
+	_fbSource.ClientDone(_nSourceClientID);
+END_IF
+
+_nContext:= 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="dtTimestamp" Id="{400a5cc9-42de-4db8-9375-3e39e2975a34}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[PROPERTY dtTimestamp : DCTIMESTRUCT]]></Declaration>
+      <Get Name="Get" Id="{d595a4e9-9059-4ab6-bcab-c824b16b2ab1}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[dtTimestamp:= F_AlyTimestampToDCTimestruct(_nTimestamp);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="eSourceState" Id="{3fadf5ac-338e-4bac-a55c-43fada65f2a8}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[PROPERTY eSourceState : E_DataSourceState]]></Declaration>
+      <Get Name="Get" Id="{9906be45-3dc9-4007-890c-00020d9d677c}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[eSourceState:= _fbSource.eDataState;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_init" Id="{84d9821c-cc28-48b6-8dab-7a1f061061a9}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains: BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode: BOOL; // if TRUE, the instance afterwards gets moved into the copy code (online change)
+	fbSource: I_InputSource;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN
+	fbSource.AddClient(nClientID=>_nSourceClientID);
+	_fbSource:= fbSource;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="fbInputSource" Id="{b3611652-af3f-4039-807a-6015d990d91b}">
+      <Declaration><![CDATA[PROPERTY fbInputSource : I_InputSource]]></Declaration>
+      <Get Name="Get" Id="{96e89225-b1a3-47ba-8433-72c177d3226c}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[fbInputSource:= _fbSource;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="nContext" Id="{588a0dcc-cb20-4e63-9a97-282e0f27c55b}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="{090de91a-e787-4045-aa95-0a3d47490d4f}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= _nContext;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="nDataHandle" Id="{38c2699e-da6d-4c1b-8d7b-2604eadc34ec}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[PROPERTY nDataHandle : ULINT]]></Declaration>
+      <Get Name="Get" Id="{85a89889-8df5-433e-9a6b-a2f7693df06d}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nDataHandle:= _nDataHandle;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="NextData" Id="{e2348384-aa9f-4400-9db6-bcb1ae420b6e}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[METHOD NextData : BOOL
+VAR_INPUT
+	nMaxOversampling: UDINT;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _nElements > 0 AND NOT bEndOfData THEN
+
+	_nSelectedOversample:= _nSelectedOversample + 1;
+	IF _nSelectedOversample > nMaxOversampling OR _nSelectedElement = 0 THEN
+		_nSelectedElement:= _nSelectedElement + 1;
+		_nSelectedOversample:= 1;
+	END_IF
+
+	NextData:= _fbSource.GetData(_nSelectedElement, ADR(_stInputs), SIZEOF(_stInputs), nTimestamp=>_nTimestamp, nContext=>_nContext);
+	_nContext:= _nContext OR E_VirtualInput.eContext_V1_Virtual_Input_Source;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nV1_nDefectiveUnits" Id="{6e202291-3174-4e5b-a9b1-0ff2b2499ade}" FolderPath="I_V1_Virtual_Input_Source\">
+      <Declaration><![CDATA[PROPERTY nV1_nDefectiveUnits : ULINT]]></Declaration>
+      <Get Name="Get" Id="{f25bd935-c88e-4c8a-b9e7-b464fcf61026}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nV1_nDefectiveUnits:= _stInputs.nGVL_Components_fbMachine_stAnalytics_nDefectiveUnits;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="nV1_nState" Id="{87e07056-3e7e-493d-bd12-ce306d4fa93a}" FolderPath="I_V1_Virtual_Input_Source\">
+      <Declaration><![CDATA[PROPERTY nV1_nState : UINT]]></Declaration>
+      <Get Name="Get" Id="{d72da6c5-df2b-4e49-87b7-3179248a3f84}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nV1_nState:= _stInputs.nGVL_Components_fbMachine_stAnalytics_nState;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="nV1_nUnitsProduced" Id="{fc9e88c7-34c1-49ca-be27-2ed51d12776d}" FolderPath="I_V1_Virtual_Input_Source\">
+      <Declaration><![CDATA[PROPERTY nV1_nUnitsProduced : ULINT]]></Declaration>
+      <Get Name="Get" Id="{4c8e876b-9bdf-4651-89cc-2b92fa67cd62}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nV1_nUnitsProduced:= _stInputs.nGVL_Components_fbMachine_stAnalytics_nUnitsProduced;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="nV1_tMlCalculation" Id="{0cfeb22c-47b7-410d-8580-7225c8318356}" FolderPath="I_V1_Virtual_Input_Source\">
+      <Declaration><![CDATA[PROPERTY nV1_tMlCalculation : UDINT]]></Declaration>
+      <Get Name="Get" Id="{582aef3e-93de-4b0a-a8a2-6d5424920887}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nV1_tMlCalculation:= _stInputs.nGVL_Components_fbMachine_stAnalytics_tMlCalculation;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="SourceSync" Id="{facef239-7c06-4502-93b6-2ae10d200b44}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[METHOD SourceSync : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _fbSource.NewDataAvailable(_nDataHandle) THEN
+	_nDataHandle:= _fbSource.nDataHandle;
+	_nElements:= _fbSource.nElements;
+
+	_nSelectedElement:= 0;
+	_nSelectedOversample:= 0;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="tTimestamp" Id="{e6a49db7-eb8c-499a-9c3f-98e9179ed2b6}" FolderPath="I_VirtualInputSource\">
+      <Declaration><![CDATA[PROPERTY tTimestamp : ULINT]]></Declaration>
+      <Get Name="Get" Id="{8a0269aa-384e-498a-a1ca-4dbf295766f9}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[tTimestamp:= _nTimestamp;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.bEndOfData.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.Done">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.dtTimestamp.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.eSourceState.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.FB_init">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.fbInputSource.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.nContext.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.nDataHandle.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.NextData">
+      <LineId Id="3" Count="9" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.nV1_nDefectiveUnits.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.nV1_nState.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.nV1_nUnitsProduced.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.nV1_tMlCalculation.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.SourceSync">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_V1_C1_Virtual_Input_Source.tTimestamp.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

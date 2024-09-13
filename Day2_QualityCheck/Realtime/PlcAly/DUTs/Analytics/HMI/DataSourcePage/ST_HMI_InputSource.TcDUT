@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_InputSource" Id="c4433802-91ac-4f04-9c02-9654fcf40f2c">
+    <Declaration><![CDATA[TYPE ST_HMI_InputSource : 
+STRUCT
+	nID: DINT;
+	sDisplayName: WSTRING(80);
+	
+	sStreamSystemID: GUID;
+	sTopic: STRING(255);
+	
+	eSourceType: E_SourceType;;
+	eState: E_DataSourceState;;
+	dtTimestamp: DCTIMESTRUCT;
+	
+	stHist: ST_HMI_DataSourceHist;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

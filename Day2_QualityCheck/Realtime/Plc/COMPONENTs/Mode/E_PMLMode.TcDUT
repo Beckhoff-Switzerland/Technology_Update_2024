@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="E_PMLMode" Id="{9848b0f9-080e-4518-bc3f-f03209af4978}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+TYPE E_PMLMode:
+(
+	(* Mandatory modes *)
+	UNDEFINED := 0,
+	PRODUCTION := 1,
+	
+	(* Optional modes *)
+	// MAINTANANCE := 2,
+	MANUAL := 3
+	
+	(* Custom modes *)
+	// ?? := 4..32
+	// use PML_UnitModeConfig
+	
+) DINT := UNDEFINED;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

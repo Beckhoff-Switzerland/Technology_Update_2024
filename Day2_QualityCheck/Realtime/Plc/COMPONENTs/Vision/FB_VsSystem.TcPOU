@@ -1,0 +1,602 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <POU Name="FB_VsSystem" Id="{01623577-fb62-4a8d-ac91-5017b9d24497}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'no_explicit_call' := 'do not call this POU directly'} 
+FUNCTION_BLOCK FB_VsSystem IMPLEMENTS I_VsSystem_Check, I_VsSystem_Plc
+VAR CONSTANT
+	(* Machine learning model constants *)
+	N_MODEL_NBR_INPUT_CHANNELS: UDINT := 3;
+	N_MODEL_INPUT_WIDTH: 		UDINT := 224;
+	N_MODEL_INPUT_HEIGHT: 		UDINT := 224;
+	N_MODEL_NBR_CLASSES: 		UDINT := 2; // ADJUST NUMBER OF CLASSES WHEN CHANGING MODEL!!!
+	N_MAX_PIXEL_VALUE: 			UDINT := 255;
+	
+	(* Preprocessing constants *)
+	N_RESIZE_WIDTH				: UDINT := 256;
+	N_RESIZE_HEIGHT				: UDINT := 256;
+	N_CENTRAL_CROPPING_WIDTH	: UDINT := 224;
+	N_CENTRAL_CROPPING_HEIGHT	: UDINT := 224;
+	
+	(* Contour filter criteria *) 
+	F_MINLENGTHCONTOUR			: LREAL := 5700; 
+	F_MINAREACONTOUR			: LREAL := 1050000; 
+	
+END_VAR
+
+VAR
+	fbFeedback 					: FB_CH_Feedback(0);
+	
+	(* Vision system and its components *)
+	fbImageProvider 			: FB_GigE_Beckhoff();
+	fbCameraTriggerController	: FB_EtherCAT_Trigger;
+	fbIllumination1				: FB_VIx2000();
+	fbIllumination2				: FB_VIx2000();
+	fbPulseMode 				: FB_VisionMode_Pulse_combined;
+	
+	fbVisionSystemCHALET 		: FB_VisionSystem(
+									ipImageProvider				:= fbImageProvider, 
+									ipCameraTriggerController 	:= fbCameraTriggerController, 
+									ipIlluminationController1 	:= fbIllumination1, 
+									ipIlluminationController2 	:= fbIllumination2);
+										
+	iVisionSystem 				: I_VisionSystem := fbVisionSystemCHALET;
+	
+	(* Puls Settings *)
+	nOrange 					: UINT(0..511) 	:= 511; 
+	nGreen 						: UINT(0..511)	:= 511;
+	nBlue 						: UINT(0..511) 	:= 511;	
+	nInfrared 					: UINT(0..511)	:= 511; 
+	nExposure_1us 				: UDINT := 50; 
+	nExposureDelay_100ns		: UDINT := 10;
+	nIlluminationOverride   	: USINT := 100;
+	nIlluminationDuration_1us 	: UDINT := 70; 
+	
+	(* State machine *)
+	eVisionState 				: E_VisionState;	
+	hr 							: HRESULT;
+
+	(* Commands *)
+	bTrigger,bTriggerNonStop	: BOOL;
+	bPulsMode					: BOOL := TRUE;
+	bCustomerMode				: BOOL;
+	bApply						: BOOL;	
+	bTriggerFixRate				: BOOL;
+	nFixRateDelayMs 			: UINT := 10;
+	nNextCamTrigger				: T_DCTIME64;
+	nNextIllTrigger				: T_DCTIME64;
+		
+	(* Interface to image processing *)
+	SLOW_hrGlobal 				: HRESULT;
+	SLOW_nImageCounter 			: UDINT;
+	SLOW_ipLiveImgWithInfo 		: ST_ImageWithInfo;
+	SLOW_ipDispImageInRGB 		: ITcVnDisplayableImage;
+	
+	fbCrititcalSection 			: FB_IecCriticalSection;
+	
+	(* Interface to machine*)
+	bQualityGood				: BOOL;
+	nNbrHoles_Expected 			: ULINT;
+	fHoleDiameter 				: LREAL;
+	nNbrHoles_Found 			: ULINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="GetQualityRating" Id="{921c3c8a-4fb8-4dc4-9be4-38330213bde7}">
+      <Declaration><![CDATA[METHOD GetQualityRating : I_CH_Feedback
+VAR_INPUT
+	nDcTrigger : T_DCTIME64;
+	nNbrHoles_Expected : LREAL;
+	fHoleDiameter : LREAL;
+END_VAR
+VAR_OUTPUT
+	bQualityGood : BOOL;
+	nNbrHoles_Found : LREAL;
+END_VAR
+VAR
+	hr : HRESULT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF fbCrititcalSection.Enter() THEN
+	(* Transfer recipe command parameters *)
+	THIS^.nNbrHoles_Expected := TO_ULINT(nNbrHoles_Expected);
+	THIS^.fHoleDiameter := fHoleDiameter;	
+	(* end of critical section *)
+	fbCrititcalSection.Leave();
+END_IF
+
+IF iVisionSystem.Operational AND NOT iVisionSystem.Busy THEN
+	hr := fbPulseMode.TriggerAtDcTime(nDcTrigger);
+	
+	IF fbCrititcalSection.Enter() THEN
+		(* start of critical section *)
+		fbFeedback.Busy := TRUE;
+		(* end of critical section *)
+		fbCrititcalSection.Leave();
+	END_IF
+END_IF
+
+IF fbCrititcalSection.Enter() THEN
+	(* Transfer recipe status parameters *)
+	nNbrHoles_Found := TO_REAL(THIS^.nNbrHoles_Found);
+	(* Transfer result *)
+	bQualityGood := THIS^.bQualityGood;
+	(* start of critical section *)
+	GetQualityRating := fbFeedback;
+	(* end of critical section *)
+	fbCrititcalSection.Leave();
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{e0051056-a04b-415d-b561-ba7335be939c}">
+      <Declaration><![CDATA[METHOD Initialize : HRESULT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF fbVisionSystemCHALET.Initialized THEN
+	
+	Initialize := S_OK;
+ELSE
+	fbVisionSystemCHALET.Initialize();
+	Initialize := S_PENDING;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Initialized" Id="{8289d397-c0e4-44ab-a325-06abacf6f2d9}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY Initialized : BOOL]]></Declaration>
+      <Get Name="Get" Id="{038d475d-90e3-4414-b7d0-d93c0194135b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Initialized := fbVisionSystemCHALET.Initialized;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Update" Id="{2620eadf-dbe6-4ad8-8b60-759b6e52b056}">
+      <Declaration><![CDATA[METHOD Update : HRESULT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE eVisionState OF
+	E_VisionState.Idle:
+		eVisionState := E_VisionState.SelectMode;
+	
+	E_VisionState.SelectMode:
+		hr := iVisionSystem.SetMode(fbPulseMode);
+		
+		IF hr = S_OK THEN
+			eVisionState := E_VisionState.Configure;
+		ELSIF FAILED(hr) OR iVisionSystem.Error THEN
+			eVisionState := E_VisionState.Error;	
+		END_IF
+	
+	(* Initial configuration during start-up *)
+	E_VisionState.Configure:
+		hr := fbPulseMode.Configure(nOrange := nOrange,	// 0-511
+									nGreen := nGreen,	// 0-511
+									nBlue := nBlue,	// 0-511
+									nInfrared := nInfrared, // 0-511
+									nExposure_1us := nExposure_1us,
+									nIlluminationOverride := nIlluminationOverride(*1-100*),
+									nIlluminationDuration_1us := nIlluminationDuration_1us);
+									
+			
+		IF hr = S_OK THEN
+			eVisionState := E_VisionState.Acquisition;
+		ELSIF FAILED(hr) OR iVisionSystem.Error THEN
+			eVisionState := E_VisionState.Error;		
+		END_IF
+		
+	(* Re-configuration during acquisition *)
+	E_VisionState.Acquisition:
+		IF bApply THEN
+			bApply := FALSE;
+			eVisionState := E_VisionState.Configure;
+		END_IF		
+		
+		IF FAILED(hr) OR iVisionSystem.Error THEN
+			eVisionState := E_VisionState.Error;		
+		END_IF
+		
+	E_VisionState.Error:
+		hr := iVisionSystem.Reset();
+		eVisionState := E_VisionState.Idle;
+
+END_CASE
+
+iVisionSystem.Update();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="UpdateSlow" Id="{015bb380-0ee6-42fe-adf6-166f6fddddf8}">
+      <Declaration><![CDATA[METHOD UpdateSlow : HRESULT
+VAR_INST
+	_ImageAvailable 				: BOOL;
+	
+	//ML Variables
+	hr_predict						: HRESULT;
+	// Load Model
+
+	sFolderPath						: STRING(255) := 'C:\Technology_Update_2024\Day2_QualityCheck\ML_models\model_11_72\';
+	sFileName						: STRING(255) := 'model_11_72.onnx';
+	sFilePath_ML            		: STRING(255) := '';
+	
+	fbReadDnn						: FB_VN_ReadNeuralNetwork;
+	ipDnnModel						: ITcVnNeuralNetwork;
+	bDnnModelInitialized			: BOOL := FALSE;
+	nReturnCode						: UDINT;
+	
+	// Model information
+	sClassLabels					: ARRAY[0..N_MODEL_NBR_CLASSES] OF STRING := ['nok_kratzer: ', 'ok_surface: ']; // ADJUST CLASS LABELS WHEN CHANGING MODEL!!!
+	aStd							: TcVnVector4_LREAL := [0.229, 0.224, 0.225];
+	aMean							: TcVnVector4_LREAL := [0.485, 0.456, 0.406];
+	ePaddingMode					: ETcVnPaddingMode := TCVN_PM_NONE;
+	eInterpolationType				: ETcVnInterpolationType := TCVN_IT_BILINEAR; // Corresponds to cv.INTER_LINEAR
+	
+	// ML Images
+	ipPreprocessedImageIn			: ITcVnImage;
+	ipResizedImageInDisp			: ITcVnDisplayableImage;
+	ipDispImageMLResult				: ITcVnDisplayableImage;
+	stPixelFormat					: TcVnPixelFormat;
+	ipTensorImage					: ITcVnImage;
+	ipDnnOutputImage				: ITcVnImage;
+	
+	// Result
+	nDnnOutputSize					: ULINT	:= 0;
+	aDnnOutputVector 				: ARRAY[1..N_MODEL_NBR_CLASSES] OF REAL; //ARRAY[1..cNumberOfClasses] OF REAL;
+	aConfidence						: TcVnVector4_LREAL;
+	aClassIndex						: TcVnPoint2_DINT;
+	sResult							: STRING(255);
+	
+	// Classical vision Images
+	SLOW_ipImageWork 		: ITcVnImage; //Image to work on
+	SLOW_ipDispImageWork 	: ITcVnDisplayableImage; //Displayable image to work on
+	SLOW_ipImageWork_old 	: ITcVnImage; //Image to compare with new image
+
+	ipStructuringElement 	: ITcVnImage; //Structuring element
+	ipContours 				: ITcVnContainer; //Found contours in image
+    ipIterator       		: ITcVnForwardIterator; //Iterator for the contour container
+    ipContour        		: ITcVnContainer; //Single contour container
+	ipMAXContour			: ITcVnContainer; //MAX contour container
+	nNbrOfContours			: ULINT; 
+	fContourArea			: LREAL; 
+	fMAXContourArea			: LREAL; 
+
+	fMINLimitContourArea	: LREAL := 1_000; //Lower limit of a borehole
+	fMAXLimitContourArea	: LREAL := 15_000; //Upper limit of a borehole
+
+	aOffset 				: TcVnPoint := [0, 0];
+	aColRed       			: TcVnVector4_LREAL := [255, 0, 0, 255];
+	aColGreen        		: TcVnVector4_LREAL := [0, 255, 0, 255];
+	aColPink        		: TcVnVector4_LREAL := [255, 100, 255, 255];
+	aColBlack        		: TcVnVector4_LREAL := [0, 0, 0, 255];
+
+	fLengthMAXContour		: LREAL; 
+	nYLabelPos				: UDINT := 80;
+	
+	ipFilteredContours 		: ITcVnContainer; //Container containing the contours matching the fMINLimitContourArea and fMAXLimitContourArea criteria
+	aImgIntensityAverage   	: TcVnVector4_LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_ImageAvailable := iVisionSystem.TryGetImage(SLOW_ipLiveImgWithInfo) = S_OK;
+// Load Dnn model
+IF NOT bDnnModelInitialized THEN
+	sFilePath_ML := CONCAT (sFolderPath, sFileName);
+	FW_SafeRelease(ADR(ipDnnModel));
+	fbReadDnn(sFilePath := sFilePath_ML, ipDestNeuralNetwork := ipDnnModel, bRead := TRUE);
+
+	IF NOT fbReadDnn.bBusy THEN
+		fbReadDnn(sFilePath:='', bRead := FALSE);
+		IF NOT fbReadDnn.bError THEN
+			bDnnModelInitialized := TRUE;
+		END_IF
+		nReturnCode := fbReadDnn.nErrorId AND 16#FFF;
+	END_IF
+END_IF
+	
+IF _ImageAvailable THEN
+	SLOW_hrGlobal := S_OK;
+	SLOW_nImageCounter := SLOW_nImageCounter + 1;
+	fMAXContourArea := 0;
+	SLOW_hrGlobal := F_VN_ConvertColorSpace(ipSrcImage:= SLOW_ipLiveImgWithInfo.ipImage, ipDestImage:= SLOW_ipLiveImgWithInfo.ipImage, eTransform:= TCVN_CST_BAYER_RG_TO_GRAY, hrPrev:= SLOW_hrGlobal);
+	
+	//Create work image to apply vision operations on, leave oringal image unedited 
+	SLOW_hrGlobal := F_VN_CopyImage(ipSrcImage:= SLOW_ipLiveImgWithInfo.ipImage, ipDestImage:= SLOW_ipImageWork, hrPrev:= SLOW_hrGlobal);
+	
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	/////////////////////////ML VISION////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	
+	// Check if new image was received
+	IF bDnnModelInitialized AND SUCCEEDED(SLOW_hrGlobal) AND SLOW_ipLiveImgWithInfo.ipImage <> 0 THEN
+		hr_predict := F_VN_GetPixelFormat(SLOW_ipLiveImgWithInfo.ipImage, stPixelFormat, hr_predict);
+
+		// Check if input image channels matches the model requirements, alternative implement the needed color space transformation yourself.
+		IF stPixelFormat.nChannels <> N_MODEL_NBR_INPUT_CHANNELS OR stPixelFormat.ePixelEncoding <> TCVN_PE_NONE THEN
+			hr_predict := F_VN_ConvertColorSpace(SLOW_ipLiveImgWithInfo.ipImage, ipPreprocessedImageIn, TCVN_CST_GRAY_TO_RGB, hr_predict);                
+		END_IF
+
+		// *** Preprocessing steps ***
+		// Adjust the dimensions of the input image to match the model input requirements
+		// Resize
+		hr_predict := F_VN_ResizeImageExp(ipPreprocessedImageIn, ipPreprocessedImageIn, N_RESIZE_WIDTH, N_RESIZE_HEIGHT, eInterpolationType, ePaddingMode, aColBlack, hr_predict);
+			
+		// Convert the image to type REAL and scale to the range [0.0, 1.0]
+		hr_predict := F_VN_ConvertElementTypeExp(ipPreprocessedImageIn, ipTensorImage, TCVN_ET_REAL, 1.0 / UDINT_TO_REAL(N_MAX_PIXEL_VALUE), 0, hr_predict);
+
+		// Normalization
+		hr_predict := F_VN_SubtractVectorFromImage(ipTensorImage, aMean, ipTensorImage,hr_predict);
+		hr_predict := F_VN_DivideImageByVector(ipTensorImage, aStd, ipTensorImage, hr_predict);
+
+		// Convert the input image to 4D Tensor
+		hr_predict := F_VN_ConvertDataLayout(ipTensorImage, ipTensorImage, TCVN_DL_4D_NCHW, hr_predict);
+
+		// *** Model execution ***
+		hr_predict := F_VN_ExecuteNeuralNetwork(ipDnnModel, ipTensorImage, ipDnnOutputImage, hr_predict);
+		
+		// Export result from NN
+		hr_predict := F_VN_ExportImageSize(ipDnnOutputImage, nDnnOutputSize, hr_predict);
+		hr_predict := F_VN_ExportImage(ipDnnOutputImage, ADR(aDnnOutputVector), nDnnOutputSize, hr_predict 	);
+
+		// *** Postprocessing steps ***
+		// Get best classfication result
+		hr_predict := F_VN_MaxPixelValue(ipDnnOutputImage, aConfidence , aClassIndex, hr_predict);
+
+		// Result visualization
+		//sResult := CONCAT(CONCAT(CONCAT(sClassLabels[aClassIndex[0]] , LREAL_TO_FMTSTR(aConfidence[0], 2, FALSE)), ' ImgNr. '), TO_STRING(SLOW_nImageCounter));
+		//hr_predict := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, 120, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColWhite, TCVN_LT_4_CONNECTED, hr_predict);
+		//SLOW_nConfidence := aConfidence[0];
+		
+		// Display images and release pointer
+		hr_predict := F_VN_TransformIntoDisplayableImage(ipPreprocessedImageIn, ipResizedImageInDisp, S_OK);
+		hr_predict := F_VN_CopyIntoDisplayableImage(SLOW_ipImageWork, ipDispImageMLResult, S_OK);
+		FW_SafeRelease(ADR(ipTensorImage));
+		FW_SafeRelease(ADR(ipDnnOutputImage));
+	END_IF
+
+	FW_SafeRelease(ADR(SLOW_ipImageWork));
+
+	//Create work image to apply vision operations on, leave oringal image unedited 
+	SLOW_hrGlobal := F_VN_CopyImage(ipSrcImage:= SLOW_ipLiveImgWithInfo.ipImage, ipDestImage:= SLOW_ipImageWork, hrPrev:= SLOW_hrGlobal);
+	
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////CLASSICAL VISION////////////////////////////
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+	
+	//smooth image to remove noise
+	SLOW_hrGlobal := F_VN_GaussianFilter(
+						ipSrcImage:= SLOW_ipImageWork, 
+						ipDestImage:= SLOW_ipImageWork, 
+						nFilterWidth:= 17, 
+						nFilterHeight:= 17, 
+						hrPrev:= SLOW_hrGlobal);
+	
+	//binarize image					
+	SLOW_hrGlobal := F_VN_Threshold(
+						ipSrcImage:= SLOW_ipImageWork, 
+						ipDestImage:= SLOW_ipImageWork, 
+						fThreshold:= 25, 
+						fMaxValue:= 255, 
+						eThresholdType:= TCVN_TT_BINARY, 
+						hrPrev:= SLOW_hrGlobal);					
+	
+	FW_SafeRelease(ADR(ipStructuringElement));	
+	
+	//apply morphological opening to remove small unwanted holes 			
+	SLOW_hrGlobal := F_VN_CreateStructuringElement(
+						ipStructuringElement:= ipStructuringElement, 
+						eShape:= TCVN_SES_RECTANGLE, 
+						nWidth:= 17, 
+						nHeight:= 17, 
+						hrPrev:= SLOW_hrGlobal);
+	
+	SLOW_hrGlobal := F_VN_MorphologicalOperator(
+						ipSrcImage:= SLOW_ipImageWork, 
+						ipDestImage:= SLOW_ipImageWork, 
+						eOperator:= TCVN_MO_CLOSING, 
+						ipStructuringElement:= ipStructuringElement, 
+						hrPrev:= SLOW_hrGlobal);
+	
+	SLOW_hrGlobal := F_VN_ImageAverage(ipSrcImage:= SLOW_ipImageWork, aAverage:= aImgIntensityAverage, hrPrev:= SLOW_hrGlobal);
+
+	//find contours in the image, using black-white image borders
+	SLOW_hrGlobal := F_VN_FindContoursExp(
+						ipSrcImage:= SLOW_ipImageWork, 
+						ipContours:= ipContours, 
+						eRetrievalMode:= TCVN_CRM_LIST, 
+						eApproximationMethod:= TCVN_CAM_SIMPLE, 
+						aOffset:= aOffset, 
+						hrPrev:= SLOW_hrGlobal);
+	
+	//Count total number of found contours
+	SLOW_hrGlobal := F_VN_GetNumberOfElements(ipContainer:= ipContours, nNumberOfElements:= nNbrOfContours, hrPrev:= SLOW_hrGlobal); 
+	SLOW_hrGlobal := F_VN_CreateContainer(ipFilteredContours, ContainerType_Vector_Vector_TcVnPoint2_DINT, 0, SLOW_hrGlobal);
+	
+	SLOW_hrGlobal := F_VN_ConvertColorSpace(ipSrcImage:= SLOW_ipImageWork, ipDestImage:= SLOW_ipImageWork, eTransform:= TCVN_CST_GRAY_TO_RGB, hrPrev:= SLOW_hrGlobal);
+
+	// Initialize the iterator for the ipContours container
+	SLOW_hrGlobal := F_VN_GetForwardIterator(ipContours, ipIterator, SLOW_hrGlobal);
+	
+	// Iterate over the contours in the container
+	WHILE SUCCEEDED(SLOW_hrGlobal) AND_THEN ipIterator.CheckIfEnd() <> S_OK DO
+		// Get the current contour from the iterator
+		hr := F_VN_GetContainer(ipIterator, ipContour, SLOW_hrGlobal);
+		
+		IF ipContour <> 0 THEN
+			SLOW_hrGlobal := F_VN_ContourArea(ipContour:= ipContour, fArea:= fContourArea, hrPrev:= SLOW_hrGlobal);
+			
+			//Get contour area of biggest contour -> measure if part has correct size 
+			IF fContourArea > fMAXContourArea THEN
+				fMAXContourArea := fContourArea;
+				FW_SafeRelease(ADR(ipMAXContour));
+				SLOW_hrGlobal := F_VN_CopyContainer(ipSrcContainer:= ipContour, ipDestContainer:= ipMAXContour, hrPrev:= SLOW_hrGlobal);    
+				//F_VN_SetContainer(ipIterator:= ipIterator, ipContainer:= ipMAXContour, hrPrev:= SLOW_hrGlobal);
+			END_IF
+			
+			//Filter the found contours based on contour area -> Limits should only allow for the small boreholes 
+			IF (fContourArea > fMINLimitContourArea) AND (fContourArea < fMAXLimitContourArea) THEN 
+				SLOW_hrGlobal := F_VN_AppendToContainer_ITcVnContainer(ipElement:= ipContour, ipContainer:= ipFilteredContours, hrPrev:= SLOW_hrGlobal);
+			END_IF
+		END_IF
+		FW_SafeRelease(ADR(ipContour));
+
+		//Increment iterator to the next contour
+		SLOW_hrGlobal := F_VN_IncrementIterator(ipIterator, SLOW_hrGlobal);
+	END_WHILE
+	FW_SafeRelease(ADR(ipIterator));
+	
+	//Count number of boreholes 
+	SLOW_hrGlobal := F_VN_GetNumberOfElements(ipContainer:= ipFilteredContours, nNumberOfElements:= THIS^.nNbrHoles_Found, hrPrev:= SLOW_hrGlobal); 
+	
+	//Visualize MAX-Contour 
+	SLOW_hrGlobal := F_VN_DrawContoursExp(
+						ipContours:= ipMAXContour, 
+						nContourIndex:= -1, 
+						ipDestImage:= SLOW_ipImageWork, 
+						aColor:= aColPink, 
+						nThickness:= 3, 
+						eLineType:= TCVN_LT_4_CONNECTED , 
+						ipHierarchy:= 0, 
+						nMaxLevel:= 4, 
+						aOffset:= aOffset, 
+						hrPrev:= SLOW_hrGlobal);
+	
+	//Visualize boreholes only
+	SLOW_hrGlobal := F_VN_DrawContoursExp(
+						ipContours:= ipFilteredContours, 
+						nContourIndex:= -1, 
+						ipDestImage:= SLOW_ipImageWork, 
+						aColor:= aColGreen, 
+						nThickness:= 3, 
+						eLineType:= TCVN_LT_4_CONNECTED , 
+						ipHierarchy:= 0, 
+						nMaxLevel:= 4, 
+						aOffset:= aOffset, 
+						hrPrev:= SLOW_hrGlobal);
+						
+	//Contour analysis					
+	SLOW_hrGlobal := F_VN_ContourPerimeter(ipContour:= ipMAXContour, fPerimeter:= fLengthMAXContour, bClosed:= TRUE, hrPrev:= SLOW_hrGlobal);
+
+	//get comprehensive part inspection result ML + clssic CV Results -> OK NOK 
+	sResult := CONCAT('# Holes: ', TO_STRING(THIS^.nNbrHoles_Found));
+	IF THIS^.nNbrHoles_Found =  THIS^.nNbrHoles_Expected THEN 
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColGreen, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	ELSE
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColRed, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	END_IF
+
+	sResult := CONCAT('Length Cnt.: ', LREAL_TO_FMTSTR(fLengthMAXContour, 0, TRUE));
+	IF fLengthMAXContour > F_MINLENGTHCONTOUR AND_THEN  fLengthMAXContour < F_MINLENGTHCONTOUR + 400 THEN 
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos * 2, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColGreen, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	ELSE
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos * 2, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColRed, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	END_IF
+	
+	sResult := CONCAT('Area Cnt.: ', LREAL_TO_FMTSTR(fMAXContourArea, 0, TRUE)); 
+	IF fMAXContourArea > F_MINAREACONTOUR THEN 
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos * 3, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColGreen, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	ELSE
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos * 3, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColRed, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	END_IF
+	
+	IF sClassLabels[aClassIndex[0]] = 'ok_surface: ' THEN 
+		sResult := 'Surface: OK';
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos * 4, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColGreen, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	ELSE
+		sResult := 'Surface: NOK';
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 5, nYLabelPos * 4, 7, 2, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColRed, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	END_IF
+
+	IF THIS^.nNbrHoles_Found = THIS^.nNbrHoles_Expected AND fLengthMAXContour > F_MINLENGTHCONTOUR AND fMAXContourArea > F_MINAREACONTOUR AND sClassLabels[aClassIndex[0]] = 'ok_surface: ' THEN 
+		bQualityGood := TRUE;
+		sResult := 'PART OK';
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 1900, nYLabelPos, 7, 3, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColGreen, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	ELSE
+		bQualityGood := FALSE;
+		sResult := 'PART NOK';
+		SLOW_hrGlobal := F_VN_PutLabelExp(sResult, SLOW_ipImageWork, 1900, nYLabelPos, 7, 3, TCVN_FT_HERSHEY_PLAIN, aColBlack, aColRed, TCVN_LT_4_CONNECTED, SLOW_hrGlobal);
+	END_IF
+	
+	//Free router memory
+	FW_SafeRelease(ADR(ipContours));
+	FW_SafeRelease(ADR(ipFilteredContours));
+	FW_SafeRelease(ADR(SLOW_ipDispImageInRGB));
+	FW_SafeRelease(ADR(SLOW_ipDispImageWork));
+	FW_SafeRelease(ADR(ipMAXContour));
+	FW_SafeRelease(ADR(SLOW_ipImageWork_old));
+	
+	SLOW_hrGlobal := F_VN_CopyImage(ipSrcImage:= SLOW_ipImageWork, ipDestImage:= SLOW_ipImageWork_old, hrPrev:= SLOW_hrGlobal);
+	
+	//Transform the two images into displayable images 
+	SLOW_hrGlobal := F_VN_TransformIntoDisplayableImage(SLOW_ipLiveImgWithInfo.ipImage, SLOW_ipDispImageInRGB, SLOW_hrGlobal);
+	SLOW_hrGlobal := F_VN_TransformIntoDisplayableImage(SLOW_ipImageWork, SLOW_ipDispImageWork, SLOW_hrGlobal);
+	
+	IF fbCrititcalSection.Enter() THEN
+		(* start of critical section *)
+		fbFeedback.Done := TRUE;
+		(* end of critical section *)
+		fbCrititcalSection.Leave();
+	END_IF
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_VsSystem">
+      <LineId Id="680" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_VsSystem.GetQualityRating">
+      <LineId Id="60" Count="0" />
+      <LineId Id="69" Count="2" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="58" Count="1" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="34" Count="4" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="72" Count="3" />
+      <LineId Id="44" Count="3" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="56" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_VsSystem.Initialize">
+      <LineId Id="10" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="2" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_VsSystem.Initialized.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_VsSystem.Update">
+      <LineId Id="14" Count="12" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="27" Count="4" />
+      <LineId Id="33" Count="12" />
+      <LineId Id="47" Count="15" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_VsSystem.UpdateSlow">
+      <LineId Id="2427" Count="264" />
+      <LineId Id="25" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

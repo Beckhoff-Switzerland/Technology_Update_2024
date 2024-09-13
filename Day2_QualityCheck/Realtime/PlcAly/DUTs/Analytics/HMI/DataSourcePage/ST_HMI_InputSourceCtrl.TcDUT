@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_InputSourceCtrl" Id="7f6fc36c-e4b4-4416-8e61-1f6cf7edee64">
+    <Declaration><![CDATA[TYPE ST_HMI_InputSourceCtrl : 
+STRUCT
+	nActiveRecordIdx: INT;
+	
+	dtSelectedRangeStart: DCTIMESTRUCT;
+	dtSelectedRangeEnd: DCTIMESTRUCT;
+	
+	bStart: BOOL;
+	bCancel: BOOL;
+	bPause: BOOL;
+	bReset: BOOL;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

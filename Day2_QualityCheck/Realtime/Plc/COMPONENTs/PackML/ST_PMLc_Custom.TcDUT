@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <DUT Name="ST_PMLc_Custom" Id="{5b79c465-b6ec-4a0f-b0cf-dbe4a985f643}">
+    <Declaration><![CDATA[TYPE ST_PMLc_Custom EXTENDS ST_PMLcMin :
+STRUCT
+	Parameter : ARRAY[1..2] OF ST_Descriptor;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

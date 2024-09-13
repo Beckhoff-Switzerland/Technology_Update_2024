@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<safetyApplication Crc="408223055" xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.4.0.0" Id="3c42f5e3-86db-465d-a1fd-83118e9477bb" name="" mapState="false" mapDiag="false" groupOrderId="0" passificationAllowed="false" temporaryDeactivationAllowed="false" permamentDeactivationAllowed="false" xmlid="0" analogFBOutputReplacementValues="Zero" verifyAnalogFBInputsIfStart="false" userFbId="00000000-0000-0000-0000-000000000000" xmlns="http://schemas.microsoft.com/dsltools/SafetyApplicationLanguage">
+  <networks>
+    <safetyApplicationHasNetworks Id="5dda41f6-4ec2-4ac5-a78e-4aed73c0579f">
+      <Network Id="1873cbea-2220-4464-91e0-3d983283bbfb" name="Network1" networkName="Network1" intId="1" networkOrderId="0" />
+    </safetyApplicationHasNetworks>
+  </networks>
+  <twinSAFEGroupAliasPorts>
+    <safetyApplicationHasTwinSAFEGroupAliasPort Id="e71e955f-6a3a-42ad-bd0b-88bbcd4e381b">
+      <twinSAFEGroupAliasPort Id="86972503-85cd-47ef-8151-12d1f09afa33" name="RunStop" sdsId="0" channelId="0" portName="RunStop" functionId="0" />
+    </safetyApplicationHasTwinSAFEGroupAliasPort>
+    <safetyApplicationHasTwinSAFEGroupAliasPort Id="421795f3-35ab-4faa-a30e-6daed449b792">
+      <twinSAFEGroupAliasPort Id="8771c9e2-a6ab-4b74-b3b6-1a273d118ddb" name="ErrAck" sdsId="0" channelId="0" portName="ErrAck" functionId="0" />
+    </safetyApplicationHasTwinSAFEGroupAliasPort>
+  </twinSAFEGroupAliasPorts>
+  <variables>
+    <safetyApplicationHasVariables Id="3f2d33ef-0037-4357-a20c-5f5a1faf5a3e">
+      <variable Id="73569313-ea9c-4fc5-a5d2-35582f4619a4" name="GroupPort_ErrAck" isLocal="false">
+        <sourceUsages>
+          <variableHasSourceUsages Id="21b8e483-50bb-4d79-9832-b2dc1551431b">
+            <variableUsages Id="ccefd567-76b6-41c5-aafe-eb838bd82d72">
+              <usages>
+                <variableUsagesHasUsages Id="3c936162-39cd-48c5-af05-88a43f8fd501">
+                  <aliasDeviceIoUsage Id="06871ab7-2296-485c-b697-25f0bb6152e0" sdsId="1" channelId="1" functionId="0" />
+                </variableUsagesHasUsages>
+              </usages>
+            </variableUsages>
+          </variableHasSourceUsages>
+        </sourceUsages>
+        <targetUsages>
+          <variableHasTargetUsages Id="6ec58f28-7445-4011-802f-9b5da277b71e">
+            <variableUsages Id="1923e8b5-fa53-488f-a03a-1d65e4df08b0">
+              <usages>
+                <variableUsagesHasUsages Id="77ad938a-c3a6-40ff-a14d-d778a5700e8d">
+                  <groupPortUsage Id="08634d8a-1e18-4cc3-9562-9302ddaafffb">
+                    <twinSAFEGroupAliasPort>
+                      <groupPortUsageReferencesTwinSAFEGroupAliasPort Id="92350328-b2b0-40d8-9821-bc8897eb69ef">
+                        <twinSAFEGroupAliasPortMoniker name="//ErrAck" />
+                      </groupPortUsageReferencesTwinSAFEGroupAliasPort>
+                    </twinSAFEGroupAliasPort>
+                  </groupPortUsage>
+                </variableUsagesHasUsages>
+              </usages>
+            </variableUsages>
+          </variableHasTargetUsages>
+        </targetUsages>
+      </variable>
+    </safetyApplicationHasVariables>
+    <safetyApplicationHasVariables Id="ce2dd0ec-d265-4ed8-880b-c7f680d2f400">
+      <variable Id="6578d151-4040-4f60-a55f-1f41503fc94b" name="GroupPort_RunStop" isLocal="false">
+        <sourceUsages>
+          <variableHasSourceUsages Id="bdacd848-ea54-4ed4-b0b8-67318770afe7">
+            <variableUsages Id="794ac994-09cd-494a-82fc-14512ae47309">
+              <usages>
+                <variableUsagesHasUsages Id="d5a5833a-82bc-4196-a6c8-c991e5f2d20b">
+                  <aliasDeviceIoUsage Id="4fc888e2-d4fe-4337-9b82-7830a380ca15" sdsId="2" channelId="1" functionId="0" />
+                </variableUsagesHasUsages>
+              </usages>
+            </variableUsages>
+          </variableHasSourceUsages>
+        </sourceUsages>
+        <targetUsages>
+          <variableHasTargetUsages Id="232c760a-5341-4617-a059-b0eed5184755">
+            <variableUsages Id="2505d631-249c-478d-9555-e49221428376">
+              <usages>
+                <variableUsagesHasUsages Id="4da387e6-5b72-446c-94a6-7b90378c6abb">
+                  <groupPortUsage Id="bf218404-c0ef-403d-b033-f98bc912cfd9">
+                    <twinSAFEGroupAliasPort>
+                      <groupPortUsageReferencesTwinSAFEGroupAliasPort Id="6f01f4be-e7c0-4caf-82fb-81de3ddc1332">
+                        <twinSAFEGroupAliasPortMoniker name="//RunStop" />
+                      </groupPortUsageReferencesTwinSAFEGroupAliasPort>
+                    </twinSAFEGroupAliasPort>
+                  </groupPortUsage>
+                </variableUsagesHasUsages>
+              </usages>
+            </variableUsages>
+          </variableHasTargetUsages>
+        </targetUsages>
+      </variable>
+    </safetyApplicationHasVariables>
+  </variables>
+</safetyApplication>

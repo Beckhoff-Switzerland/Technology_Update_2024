@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="E_ScopeCommand" Id="2bc43781-cfbe-4064-b9d4-01b43e510a9b">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_ScopeCommand : 
+(
+	eDefault := 0,
+	ePause,
+	eStop
+) ;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <DUT Name="ST_PML_Custom" Id="{31d39a5d-a4a8-4aa1-a44c-7ca966a52f3f}">
+    <Declaration><![CDATA[TYPE ST_PML_Custom :
+STRUCT
+	Command 	: ST_PMLc_Custom;
+	Status 		: ST_PMLs_Custom;
+	Admin 		: ST_PMLaMin;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

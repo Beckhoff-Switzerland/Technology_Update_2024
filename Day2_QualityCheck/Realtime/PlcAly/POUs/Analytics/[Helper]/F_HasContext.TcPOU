@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_HasContext" Id="df51142c-1aeb-4b08-8c79-67dd2cce7e83" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_HasContext : BOOL
+VAR_INPUT
+	nContext: DWORD;
+	nSearchContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+F_HasContext:= (nContext > 0) AND (((nContext AND nSearchContext) > 0) OR (nSearchContext = E_DataSourceContext.eContext_Unknown));]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,6 @@
+
+
+	#TcHmiHostRegion > .TcHmi_Controls_System_TcHmiRegion-template > .tchmi-analytics-network-content {
+	overflow-y: auto;
+	overflow-x: hidden;
+	}

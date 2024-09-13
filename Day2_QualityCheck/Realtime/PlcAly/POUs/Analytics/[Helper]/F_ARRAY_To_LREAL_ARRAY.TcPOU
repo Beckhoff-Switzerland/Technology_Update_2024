@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_ARRAY_To_LREAL_ARRAY" Id="a6bad9fa-68e0-437a-9e7c-77d05d54df3b" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_ARRAY_To_LREAL_ARRAY : BOOL
+VAR_INPUT
+	pDataIn: POINTER TO BYTE;
+	cbDataIn: UDINT;
+	eDataType: E_DTType;
+END_VAR
+VAR_IN_OUT
+	aDataOut: ARRAY [*] OF LREAL;
+END_VAR
+VAR
+	i: DINT;
+	nPos: UDINT;
+	
+	pBOOL: POINTER TO BOOL;
+	pBYTE: POINTER TO BYTE;
+	pWORD: POINTER TO WORD;
+	pDWORD: POINTER TO DWORD;
+	pSINT: POINTER TO SINT;
+	pUSINT: POINTER TO USINT;
+	pINT: POINTER TO INT;
+	pUINT: POINTER TO UINT;
+	pDINT: POINTER TO DINT;
+	pUDINT: POINTER TO UDINT;
+	pLINT: POINTER TO LINT;
+	pULINT: POINTER TO ULINT;
+	pREAL: POINTER TO REAL;
+	pLREAL: POINTER TO LREAL;
+	pLWORD: POINTER TO LWORD;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FOR i := LOWER_BOUND(aDataOut,1) TO UPPER_BOUND(aDataOut,1) DO
+	CASE eDataType OF
+		E_DTType.NotInitialized:
+			F_ARRAY_To_LREAL_ARRAY:= FALSE;
+			RETURN;
+		E_DTType.BOOL_:
+			IF (nPos * 1) < cbDataIn THEN
+				pBOOL:= pDataIn + (nPos * 1);
+				aDataOut[i] := TO_LREAL(pBOOL^);
+			END_IF
+		E_DTType.BYTE_:
+			IF (nPos * 1) < cbDataIn THEN
+				pBYTE:= pDataIn + (nPos * 1);
+				aDataOut[i] := TO_LREAL(pBYTE^);
+			END_IF
+		E_DTType.WORD_:
+			IF (nPos * 2) < cbDataIn THEN
+				pWORD:= pDataIn + (nPos * 2);
+				aDataOut[i] := TO_LREAL(pWORD^);
+			END_IF
+		E_DTType.DWORD_:
+			IF (nPos * 4) < cbDataIn THEN
+				pDWORD:= pDataIn + (nPos * 4);
+				aDataOut[i] := TO_LREAL(pDWORD^);
+			END_IF
+		E_DTType.SINT_:
+			IF (nPos * 1) < cbDataIn THEN
+				pSINT:= pDataIn + (nPos * 1);
+				aDataOut[i] := TO_LREAL(pSINT^);
+			END_IF
+		E_DTType.INT_:
+			IF (nPos * 2) < cbDataIn THEN
+				pINT:= pDataIn + (nPos * 2);
+				aDataOut[i] := TO_LREAL(pINT^);
+			END_IF
+		E_DTType.UINT_:
+			IF (nPos * 2) < cbDataIn THEN
+				pUINT:= pDataIn + (nPos * 2);
+				aDataOut[i] := TO_LREAL(pUINT^);
+			END_IF
+		E_DTType.DINT_:
+			IF (nPos * 4) < cbDataIn THEN
+				pDINT:= pDataIn + (nPos * 4);
+				aDataOut[i] := TO_LREAL(pDINT^);
+			END_IF
+		E_DTType.UDINT_:
+			IF (nPos * 4) < cbDataIn THEN
+				pUDINT:= pDataIn + (nPos * 4);
+				aDataOut[i] := TO_LREAL(pUDINT^);
+			END_IF
+		E_DTType.LINT_:
+			IF (nPos * 8) < cbDataIn THEN
+				pLINT:= pDataIn + (nPos * 8);
+				aDataOut[i] := TO_LREAL(pLINT^);
+			END_IF
+		E_DTType.ULINT_:
+			IF (nPos * 8) < cbDataIn THEN
+				pULINT:= pDataIn + (nPos * 8);
+				aDataOut[i] := TO_LREAL(pULINT^);
+			END_IF
+		E_DTType.REAL_:
+			IF (nPos * 4) < cbDataIn THEN
+				pREAL:= pDataIn + (nPos * 4);
+				aDataOut[i] := TO_LREAL(pREAL^);
+			END_IF
+		E_DTType.LREAL_:
+			IF (nPos * 8) < cbDataIn THEN
+				pLREAL:= pDataIn + (nPos * 8);
+				aDataOut[i] := TO_LREAL(pLREAL^);
+			END_IF
+		E_DTType.LWORD_:
+			IF (nPos * 8) < cbDataIn THEN
+				pLWORD:= pDataIn + (nPos * 8);
+				aDataOut[i] := TO_LREAL(pLWORD^);
+			END_IF
+	END_CASE
+
+	nPos:= nPos + 1;
+END_FOR
+
+F_ARRAY_To_LREAL_ARRAY:= TRUE;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

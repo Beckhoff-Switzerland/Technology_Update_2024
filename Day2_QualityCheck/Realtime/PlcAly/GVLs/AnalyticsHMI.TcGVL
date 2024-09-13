@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <GVL Name="AnalyticsHMI" Id="976eba34-fb7c-4fa5-9baf-4c9da34066e9">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	//Switch between historical and live data
+	stHMI_DataSourceCtrl: ST_HMI_DataSourceCtrl;
+	stHMI_DataSourceConfig: ARRAY [0..0] OF ST_HMI_DataSourceConfig := [ 
+																	( nID:= 1, sDisplayName:= "AlyConfig", eConfigType:= E_SourceType.eLive, 
+																		aInputSources:= [ 
+																			( nID:= 1, sDisplayName:= "00436273-58a1-a0ec-e33c-07029f4f38f0", sStreamSystemID:= STRING_TO_GUID('00436273-58a1-a0ec-e33c-07029f4f38f0'), 
+																				sTopic:= 'DefaultMainTopic/PlcStream1', eSourceType:= E_SourceType.eLive, eState:= E_DataSourceState.eUnknown ) ] ) ];
+	
+	//Reset
+	bN1_OEEDashboard_Reset: BOOL;
+	bN1_M1_State_Unit_Reset: BOOL;
+	bN1_M2_State_Execute_Reset: BOOL;
+	bN1_M3_State_Aborted_Reset: BOOL;
+	bN1_M4_State_Stopped_Reset: BOOL;
+	bN1_M5_Time_Scheduled_Reset: BOOL;
+	bN1_M6_OverallEquipmentEffectivenessOEE_Reset: BOOL;
+	bN1_M7_MachineLearningCalculationDuration_Reset: BOOL;
+	bN2_Products_Produced_Reset: BOOL;
+	bN2_M1_BatchNShift1Ch_Reset: BOOL;
+	bN2_M2_MathOperation_Reset: BOOL;
+	bN2_M3_EdgeCounter1Ch_Reset: BOOL;
+	bN3_Products_Defective_Reset: BOOL;
+	bN3_M1_BatchNShift1Ch_Reset: BOOL;
+	bN3_M2_MathOperation_Reset: BOOL;
+	bN3_M3_EdgeCounter1Ch_Reset: BOOL;
+	
+	//HMI Structs
+	stHMI_C1_OEE_Dashboard: ST_HMI_C1_OEE_Dashboard;
+	
+	//HMI Map Items
+	aMapItems: ARRAY [0..0] OF ST_HMI_MapItem := [(sName:="00436273-58a1-a0ec-e33c-07029f4f38f0", sDescription:="", sPosition:="", nStatus:= 0)];
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

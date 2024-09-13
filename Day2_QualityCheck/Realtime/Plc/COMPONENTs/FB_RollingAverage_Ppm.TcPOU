@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_RollingAverage_Ppm" Id="{1f98aed1-8a87-4e4d-be94-2918753b949b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RollingAverage_Ppm
+VAR CONSTANT
+	LOW : UINT := 0;
+	HIGH : UINT := 59;
+END_VAR
+VAR
+	aCounts : ARRAY[LOW..HIGH] OF UINT;
+	fbTimer : TON := (PT:=T#1S);
+	nLatestIndex : UINT := LOW;
+	bInitialized : BOOL;
+	nIdx : UINT;
+	bEnable : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF bEnable THEN
+	fbTimer(IN := TRUE);
+	IF fbTimer.Q THEN
+		fbTimer(IN := FALSE);
+		aCounts[nLatestIndex] := 0;
+		nLatestIndex := (nLatestIndex + 1) MOD (HIGH + 1);
+		IF (nLatestIndex = 0) THEN bInitialized := TRUE; END_IF
+	END_IF
+ELSE
+	fbTimer(IN := FALSE);
+	nLatestIndex := LOW;
+	bInitialized := FALSE;
+	FOR nIdx := LOW TO HIGH DO
+		aCounts[nIdx] := 0;
+	END_FOR
+END_IF
+]]></ST>
+    </Implementation>
+    <Property Name="Count" Id="{267e785e-413b-4acd-b77f-09b0012f0c55}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY Count : UINT]]></Declaration>
+      <Get Name="Get" Id="{28fb3f5e-5c15-4ec0-b23b-e65b18489d7a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Count := aCounts[nLatestIndex];]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Enable" Id="{02be5590-d706-419c-a92a-2f50b996aa52}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY Enable : BOOL]]></Declaration>
+      <Get Name="Get" Id="{86997190-cb15-461e-a742-5ffa1e119885}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Enable := bEnable;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{dd020c8e-2ed7-4535-b608-7ca40d880e47}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bEnable := Enable;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Increment" Id="{3f58cae1-0188-4a4b-8ca9-25da58294ef4}">
+      <Declaration><![CDATA[METHOD Increment
+VAR
+	nIdx : UINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR nIdx := LOW TO HIGH DO
+	aCounts[nIdx] := aCounts[nIdx] + 1;
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Initialized" Id="{3f6b3dc1-3c6a-41be-b8ad-f706e8d555b3}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'call'}
+PROPERTY Initialized : BOOL]]></Declaration>
+      <Get Name="Get" Id="{095cc6d5-c49d-4b13-a933-88615a383b45}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Initialized := bInitialized;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_RollingAverage_Ppm">
+      <LineId Id="26" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="18" Count="1" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="28" Count="3" />
+      <LineId Id="33" Count="1" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RollingAverage_Ppm.Count.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RollingAverage_Ppm.Enable.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RollingAverage_Ppm.Enable.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RollingAverage_Ppm.Increment">
+      <LineId Id="5" Count="0" />
+      <LineId Id="9" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_RollingAverage_Ppm.Initialized.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

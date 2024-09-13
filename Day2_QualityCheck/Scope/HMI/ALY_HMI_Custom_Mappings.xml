@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ALY_HMI_Mappings version="2.0">
+  <AlgCtrlMappings>
+    <Ctrl GuidID="000000c8-0000-0000-0000-000000000000" Name="HMI_Ctrl_SingleValue" Guid="997C5C25-9A39-45E4-AA05-100000000010">
+      <Alg DisplayText="State" ClsID="A7739182-BE0C-4527-A3BE-87043D4FBDE1" GuidID="f2adef14-191d-4ec4-a599-7d8c46969614">
+        <FunctionMap>
+          <Map HMI_Prop="1" Short_Name="Output" />
+        </FunctionMap>
+      </Alg>
+    </Ctrl>
+  </AlgCtrlMappings>
+</ALY_HMI_Mappings>

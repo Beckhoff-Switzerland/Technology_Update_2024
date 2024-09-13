@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.2.0.0" ProductVersion="3.1.4024.13">
+  <DUT Name="ST_T1_Inputs" Id="{896326a7-a5e9-4d0f-8f93-d69b8fa904da}">
+    <Declaration><![CDATA[TYPE ST_T1_Inputs : 
+STRUCT
+	nGVL_Components_fbMachine_stAnalytics_nState: UINT; //GVL_Components.fbMachine.stAnalytics.nState
+	nGVL_Components_fbMachine_stAnalytics_nUnitsProduced: ULINT; //GVL_Components.fbMachine.stAnalytics.nUnitsProduced
+	nGVL_Components_fbMachine_stAnalytics_nDefectiveUnits: ULINT; //GVL_Components.fbMachine.stAnalytics.nDefectiveUnits
+	nGVL_Components_fbMachine_stAnalytics_tMlCalculation: UDINT; //GVL_Components.fbMachine.stAnalytics.tMlCalculation
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

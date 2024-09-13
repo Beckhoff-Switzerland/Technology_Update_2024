@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_StationLoadProcess" Id="{2d658693-d8d7-4b1a-9889-4c4c3928d32d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_StationLoadProcess EXTENDS FB_StationBase
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Update" Id="{1a596f49-4e27-4bdc-affc-27e2f58c653a}">
+      <Declaration><![CDATA[METHOD Update
+VAR_INPUT
+	iStation : I_XTS_Station_PLC;
+END_VAR
+VAR_INST
+	fbTonDelay : ton;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Update(iStation := iStation);
+
+CASE nState OF
+	E_StationProcessState.Idle:
+		;
+		
+	E_StationProcessState.ProcessStart:
+		CASE eOpMode OF
+			E_OpMode.Auto:
+				nState := E_StationProcessState.ProcessBusy;
+			E_OpMode.Calibration:
+				nState := E_StationProcessState.ProcessDone;	// go ahead to Station Calibration
+		END_CASE
+		
+	E_StationProcessState.ProcessBusy:
+		fbTonDelay(In:= TRUE, PT:= T#250MS);
+		IF fbTonDelay.Q THEN
+			fbTonDelay(In:= FALSE);
+			nState := E_StationProcessState.ProcessDone;			
+		END_IF
+		
+	E_StationProcessState.ProcessDone:
+		CASE eOpMode OF
+			E_OpMode.Simulation:
+				; // wait nothing to do
+			E_OpMode.Auto:
+				main.iXtsSystem.Station('Loading').SendMoversToStation('Mounting');
+			E_OpMode.Calibration:
+				main.iXtsSystem.Station('Loading').SendMoversToStation('Calibration');
+		END_CASE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

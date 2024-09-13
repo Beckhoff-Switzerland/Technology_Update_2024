@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_ToANY" Id="230d28cd-b685-4ae7-b48f-56431857e8ce" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_ToANY : __SYSTEM.AnyType
+VAR_INPUT
+	Input: ANY;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[F_ToANY:= Input;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

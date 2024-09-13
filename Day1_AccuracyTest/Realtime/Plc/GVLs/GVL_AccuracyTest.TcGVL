@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="GVL_AccuracyTest" Id="{a81ec760-3eca-4edc-ae04-c1476b712d52}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	N_NBR_POSITIONS 	: UINT := 10;
+	N_NBR_CYCLES 		: UINT := 5;
+	N_NBR_DELAY_CYCLES 	: UINT := 5;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

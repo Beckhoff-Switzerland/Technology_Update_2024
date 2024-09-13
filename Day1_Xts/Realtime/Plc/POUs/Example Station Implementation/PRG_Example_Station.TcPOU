@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="PRG_Example_Station" Id="{6577d72d-9932-4b2d-a397-2ed99fb2c1fe}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_Example_Station
+VAR
+	bInitDone : BOOL;
+	
+	fbStationLoad : FB_StationLoadProcess;
+	fbStationMounting : FB_StationMoutingProcess;
+	fbStationCalib : FB_StationCalibProcess;
+	fbStationUnLoad : FB_StationUnLoadProcess;
+	
+	eOpMode : E_OpMode;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bInitDone THEN
+	bInitDone := TRUE;
+END_IF
+
+//fbStationLoad.Update(iStation := MAIN.iXtsSystem.Station('Loading'));
+//fbStationUnLoad.Update(iStation := MAIN.iXtsSystem.Station('Unloading'));
+fbStationMounting.Update(iStation := MAIN.iXtsSystem.Station('Mounting'));
+fbStationCalib.Update(iStation := MAIN.iXtsSystem.Station('Calibration'));
+
+fbStationLoad.SetOpMode 	:= PRG_Example_Station.eOpMode;
+fbStationMounting.SetOpMode := PRG_Example_Station.eOpMode;
+fbStationCalib.SetOpMode 	:= PRG_Example_Station.eOpMode;
+fbStationUnLoad.SetOpMode	:= PRG_Example_Station.eOpMode;]]></ST>
+    </Implementation>
+    <Method Name="CmdOpMode" Id="{c2074737-6369-4c54-b949-d9ff4b6b3917}">
+      <Declaration><![CDATA[METHOD CmdOpMode
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="setOpMode" Id="{5acf4bac-13f2-4d2a-9275-dcab23c8c5ed}">
+      <Declaration><![CDATA[PROPERTY setOpMode : E_OpMode]]></Declaration>
+      <Set Name="Set" Id="{4efe392b-5dae-40d6-89da-2ec9dd3ea79f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PRG_Example_Station.eOpMode := setOpMode;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

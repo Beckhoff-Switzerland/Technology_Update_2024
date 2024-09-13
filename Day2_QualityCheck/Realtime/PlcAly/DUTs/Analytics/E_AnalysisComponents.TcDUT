@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="E_AnalysisComponents" Id="57c1212a-14b6-4736-b331-83a16b603fa2">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_AnalysisComponents : 
+(
+	All := -1,
+	N1_OEEDashboard := 0,
+	N1_M1_State_Unit := 1,
+	N1_M2_State_Execute := 2,
+	N1_M3_State_Aborted := 3,
+	N1_M4_State_Stopped := 4,
+	N1_M5_Time_Scheduled := 5,
+	N1_M6_OverallEquipmentEffectivenessOEE := 6,
+	N1_M7_MachineLearningCalculationDuration := 7,
+	N2_Products_Produced := 8,
+	N2_M1_BatchNShift1Ch := 9,
+	N2_M2_MathOperation := 10,
+	N2_M3_EdgeCounter1Ch := 11,
+	N3_Products_Defective := 12,
+	N3_M1_BatchNShift1Ch := 13,
+	N3_M2_MathOperation := 14,
+	N3_M3_EdgeCounter1Ch := 15,
+	V1_Virtual_Input_Source := 16
+) ;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

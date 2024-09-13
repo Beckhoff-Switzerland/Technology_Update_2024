@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<TcSmItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.55" ClassName="CDevEtherCATDef" SubType="111" TcProjectVariant="HW_Lyssach">
+	<Device Id="3" DevType="111" DevFlags="#x0003" AmsPort="28675" AmsNetId="10.0.2.15.4.1" RemoteName="Gerät 3 (EtherCAT)" InfoImageId="14">
+		<Name>__FILENAME__</Name>
+		<ProjectVariant PvUseDisable="true">
+			<Variant>
+				<Name>HW_Lyssach</Name>
+				<Disable>0</Disable>
+			</Variant>
+			<Variant>
+				<Name>Simulation</Name>
+				<Disable>1</Disable>
+			</Variant>
+		</ProjectVariant>
+		<AddressInfo>
+			<Pnp>
+				<DeviceDesc>Ethernet 3 (TwinCAT-Intel PCI Ethernet Adapter (Gig</DeviceDesc>
+				<DeviceName>\DEVICE\{8FD7E11A-F36F-46E1-AF22-E7A2B6AACB9D}</DeviceName>
+				<DeviceData>00010529bc53</DeviceData>
+			</Pnp>
+		</AddressInfo>
+		<Image Id="13" AddrType="9" ImageType="3">
+			<Name>Prozessabbild</Name>
+		</Image>
+		<Box File="Klemme 36 (EK1100).xti" Id="36">
+			<EtherCAT PortABoxInfo="#x00ffffff"/>
+		</Box>
+		<EtherCAT/>
+	</Device>
+</TcSmItem>

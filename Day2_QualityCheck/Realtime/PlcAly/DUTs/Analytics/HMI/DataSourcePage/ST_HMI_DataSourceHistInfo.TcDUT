@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_DataSourceHistInfo" Id="c832f19f-a3f6-4abb-b47a-07f954ac21f4">
+    <Declaration><![CDATA[TYPE ST_HMI_DataSourceHistInfo : 
+STRUCT
+	sSPGuid: GUID;
+	sAlyFilePath: STRING(255);
+	sSourceType: STRING(80);
+	sTopic: STRING(255);
+	sLayoutID: GUID;
+	sAlias: STRING(255);
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,185 @@
+{
+  "controlTypeValues": {
+  "TcHmi.Controls.Analytics.Menu": {
+      "attributes": {
+        "FontColor": {
+          "color": "rgba(0, 0, 0, 1)"
+        },
+        "HoverFontColor": {
+          "color": "rgba(255, 255, 255, 1)"
+        },
+        "ControlColorLightPlus": {
+          "color": "rgba(204, 204, 204, 1)"
+        },
+        "ControlColorMiddle": {
+          "color": "rgba(102, 102, 102, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.Beckhoff.TcHmiRadioButton": {
+      "attributes": {
+        "TextColor": {
+          "color": "rgba(0, 0, 0, 1)"
+        },
+        "RadioStateIconColor": {
+          "color": "rgba(71, 148, 218, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.Beckhoff.TcHmiToggleSwitch": {
+      "attributes": {
+        "TextColor": {
+          "color": "rgba(76, 99, 116, 1)"
+        },
+        "ToggleStateIconColor": {
+          "color": "rgba(255, 255, 255, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.Analytics.LayoutManager": {
+      "attributes": {
+        "data-tchmi-dark-mode": false
+      },
+      "themedResources": {}
+    },
+      "TcHmi.Controls.Analytics.MapControl": {
+      "attributes": {
+        "FontColor": {
+          "color": "rgba(0, 0, 0, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.System.TcHmiContainer": {
+      "attributes": {
+        "BorderColor": {
+          "color": "None"
+        },
+        "BackgroundColor": {
+          "angle": 180.0,
+          "stopPoints": [
+            {
+              "color": "rgba(100, 100, 100, 0.3921568)",
+              "stop": "0%"
+            },
+            {
+              "color": "rgba(200, 200, 200, 0.3921568)",
+              "stop": "100%"
+            }
+          ]
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.System.TcHmiView": {
+      "attributes": {
+        "BorderColor": null
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.ResponsiveNavigation.TcHmiNavigationBar": {
+      "attributes": {
+        "HighLightColor": "{\r\n  \"color\": \"#FF0000\"\r\n}",
+        "FontColor": "{\r\n  \"color\": \"#000000\"\r\n}",
+        "TriangleColor": {
+          "color": "rgba(255, 255, 255, 1)"
+        },
+        "BackgroundColor": {
+          "color": "rgba(227, 227, 227, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.ResponsiveNavigation.TcHmiNavigationContent": {
+      "attributes": {
+        "FontColor": "{\r\n  \"color\": \"#000000\"\r\n}",
+        "MenuBackgroundColor": "{\r\n  \"color\": \"#FFFFFF\"\r\n}"
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.ResponsiveNavigation.TcHmiBreadcrumb": {
+      "attributes": {
+        "FontColor": "{\r\n  \"color\": \"#000000\"\r\n}"
+      },
+      "themedResources": {}
+      },
+    "TcHmi.Controls.Beckhoff.TcHmiLineChart": {
+      "attributes": {
+        "XAxisNameFontColor": {
+          "color": "rgba(0, 0, 0, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.Analytics.MultiValueControl": {
+      "attributes": {
+        "ControlBackgroundColorStart": {
+          "color": "rgba(59, 94, 158, 1)"
+        },
+        "ControlBackgroundColorEnd": {
+          "color": "rgba(227, 227, 227, 1)"
+        }
+      },
+      "themedResources": {}
+    },
+    "TcHmi.Controls.Analytics.UserPermissionPopup": {
+      "attributes": {
+        "data-tchmi-dark-mode": "false"
+      },
+      "themedResources": {}
+    }
+  },
+  "controlClassValues": {
+    "Default": {
+      "attributes": {
+        "BackgroundColor": {
+          "angle": 135.0,
+          "stopPoints": [
+            {
+              "color": "rgba(239, 241, 243, 1)",
+              "stop": "0%"
+            },
+            {
+              "color": "rgba(174, 185, 194, 1)",
+              "stop": "100%"
+            }
+          ]
+        },
+        "BorderColor": {
+          "color": "rgba(166, 166, 166, 1)"
+        },
+        "BorderWidth": {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": 0,
+          "leftUnit": "px",
+          "rightUnit": "px",
+          "topUnit": "px",
+          "bottomUnit": "px"
+        },
+        "BorderStyle": {
+          "left": "Solid",
+          "right": "Solid",
+          "top": "Solid",
+          "bottom": "Solid"
+        },
+        "BorderRadius": {
+          "topLeft": 0.0,
+          "topRight": 0.0,
+          "bottomLeft": 0.0,
+          "bottomRight": 0.0,
+          "topLeftUnit": "px",
+          "topRightUnit": "px",
+          "bottomLeftUnit": "px",
+          "bottomRightUnit": "px"
+        }
+      },
+      "themedResources": {}
+    }
+  },
+  "$schema": "../.hmiframework/Schema/ThemeDescription.Schema.json"
+}

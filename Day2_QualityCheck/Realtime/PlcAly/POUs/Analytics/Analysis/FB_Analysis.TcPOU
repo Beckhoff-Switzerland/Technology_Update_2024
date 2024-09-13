@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.2.0.0" ProductVersion="3.1.4024.13">
+  <POU Name="FB_Analysis" Id="{2f7e94cd-bab8-4cbd-982e-23d284a9e224}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Analysis
+VAR_INPUT
+	nConfigurationID: INT;
+	ipVirtual_Input_Source: I_V1_Virtual_Input_Source;
+	
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage := fbTcMsgSuccess;
+END_VAR
+VAR
+	fbTcMsgSuccess: FB_TcMessageSuccess;
+	
+	R_TRIG_Reset: R_TRIG;
+	bResetBusy: BOOL;
+	
+	fbN1_OEEDashboard: FB_N1_OEEDashboard;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="{3a7653f4-89fd-4db7-8d44-0868251220f1}">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//Analytics Network "OEEDashboard" with ID: 1
+fbN1_OEEDashboard.Call(THIS);
+
+
+//Error Handling
+IF fbN1_OEEDashboard.bError THEN
+	bError:= TRUE;
+	ipTcResult:= fbN1_OEEDashboard.ipTcResult;
+ELSE
+	bError:= FALSE;
+	ipTcResult:= fbTcMsgSuccess;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetHMIValues" Id="{e3338bc0-5caf-4214-b8e0-03471a39dfbb}">
+      <Declaration><![CDATA[METHOD GetHMIValues : BOOL
+VAR_INPUT
+	nContentID: DINT;
+	pContent: PVOID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE nContentID OF
+	1:
+		GetHMIValues:= GetHMIValues OR fbN1_OEEDashboard.fbM6_OverallEquipmentEffectivenessOEE.GetHMI(1, pContent);
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="{a13cb4ba-f495-4a83-a75c-c24f87014f9a}">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="{3f34aa3e-51ec-4794-9450-4e14988283a0}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[
+nContext:= 0;
+IF ipVirtual_Input_Source <> 0 THEN
+	nContext:= ipVirtual_Input_Source.nContext;
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Reset" Id="{46b74404-496e-4a24-a1b5-64b1dda164cd}">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR_IN_OUT
+	stReset: ST_AnalysisReset;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+R_TRIG_Reset(CLK:= stReset.bResetExecute);
+IF R_TRIG_Reset.Q OR bResetBusy THEN
+	bResetBusy:= TRUE;
+
+	CASE stReset.eResetComponent OF
+		E_AnalysisComponents.All:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.Reset();
+		E_AnalysisComponents.N1_OEEDashboard:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.Reset();
+		E_AnalysisComponents.N1_M1_State_Unit:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM1_State_Unit.Reset();
+		E_AnalysisComponents.N1_M2_State_Execute:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM2_State_Execute.Reset();
+		E_AnalysisComponents.N1_M3_State_Aborted:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM3_State_Aborted.Reset();
+		E_AnalysisComponents.N1_M4_State_Stopped:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM4_State_Stopped.Reset();
+		E_AnalysisComponents.N1_M5_Time_Scheduled:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM5_Time_Scheduled.Reset();
+		E_AnalysisComponents.N1_M6_OverallEquipmentEffectivenessOEE:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM6_OverallEquipmentEffectivenessOEE.Reset();
+		E_AnalysisComponents.N1_M7_MachineLearningCalculationDuration:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM7_MachineLearningCalculationDuration.Reset();
+		E_AnalysisComponents.N2_Products_Produced:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.Reset();
+		E_AnalysisComponents.N2_M1_BatchNShift1Ch:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.fbM1_BatchNShift1Ch.Reset();
+		E_AnalysisComponents.N2_M2_MathOperation:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.fbM2_MathOperation.Reset();
+		E_AnalysisComponents.N2_M3_EdgeCounter1Ch:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.fbM3_EdgeCounter1Ch.Reset();
+		E_AnalysisComponents.N3_Products_Defective:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.Reset();
+		E_AnalysisComponents.N3_M1_BatchNShift1Ch:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.fbM1_BatchNShift1Ch.Reset();
+		E_AnalysisComponents.N3_M2_MathOperation:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.fbM2_MathOperation.Reset();
+		E_AnalysisComponents.N3_M3_EdgeCounter1Ch:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.fbM3_EdgeCounter1Ch.Reset();
+		E_AnalysisComponents.V1_Virtual_Input_Source:
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM1_State_Unit.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM2_State_Execute.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM3_State_Aborted.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM4_State_Stopped.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM5_Time_Scheduled.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM6_OverallEquipmentEffectivenessOEE.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbM7_MachineLearningCalculationDuration.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.fbM1_BatchNShift1Ch.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.fbM2_MathOperation.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN2_Products_Produced.fbM3_EdgeCounter1Ch.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.fbM1_BatchNShift1Ch.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.fbM2_MathOperation.Reset();
+			bResetBusy:= bResetBusy AND fbN1_OEEDashboard.fbN3_Products_Defective.fbM3_EdgeCounter1Ch.Reset();
+	END_CASE
+
+	bResetBusy:= NOT bResetBusy;
+
+	stReset.bResetExecute:= bResetBusy;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetHMIValues" Id="{e2c9a07c-fd0e-406f-a744-b34073887b5b}">
+      <Declaration><![CDATA[METHOD SetHMIValues : BOOL
+VAR_INPUT
+	nContentID: DINT;
+	pContent: PVOID;
+	bHMIReinit: BOOL;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE nContentID OF
+	1:
+		SetHMIValues:= fbN1_OEEDashboard.fbM1_State_Unit.SetHMI(1, pContent, bHMIReinit);
+		SetHMIValues:= SetHMIValues AND fbN1_OEEDashboard.fbM6_OverallEquipmentEffectivenessOEE.SetHMI(1, pContent, bHMIReinit);
+		SetHMIValues:= SetHMIValues AND fbN1_OEEDashboard.fbM7_MachineLearningCalculationDuration.SetHMI(1, pContent, bHMIReinit);
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Analysis">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Analysis.Call">
+      <LineId Id="3" Count="11" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Analysis.GetHMIValues">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Analysis.nContext.Get">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Analysis.Reset">
+      <LineId Id="3" Count="60" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Analysis.SetHMIValues">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

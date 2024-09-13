@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_TcMessageSuccess" Id="80530bba-1e56-41aa-8c40-4f363c2dfc2f" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TcMessageSuccess EXTENDS FB_TcMessage
+VAR
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_init" Id="927a351d-1868-4929-a893-ae85e68e52a0">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains: BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode: BOOL; // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN
+	SUPER^.CreateEx(Tc3_EventLogger.SUCCESS_EVENT, 0);
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,17 @@
+{
+  "function": {
+    "name": "ToggleDock",
+    "namespace": "TcHmi.Functions.AnalyticsHMIProject",
+    "displayName": "ToggleDock",
+    "description": "",
+    "waitMode": "Synchronous",
+    "category": "",
+    "returnValue": {
+      "type": "tchmi:general#/definitions/String"
+    },
+    "visible": true,
+    "injectContextObject": false,
+    "arguments": []
+  },
+  "$schema": "../.hmiframework/Schema/FunctionDescription.Schema.json"
+}

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="average" Id="{b4c02b53-6ff4-4574-acb6-cb645834b651}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION average : LREAL
+VAR_IN_OUT
+	aData : ARRAY[*] OF LREAL;
+END_VAR
+VAR
+	nIdx  : DINT;
+	fAmount, fSum : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fAmount := 0;
+FOR nIdx := LOWER_BOUND(aData,1) TO UPPER_BOUND(aData,1) DO
+	fAmount := fAmount + 1;
+    fSum := fSum + aData[nIdx] ;
+END_FOR
+
+average := fSum / fAmount;]]></ST>
+    </Implementation>
+    <LineIds Name="average">
+      <LineId Id="66" Count="5" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

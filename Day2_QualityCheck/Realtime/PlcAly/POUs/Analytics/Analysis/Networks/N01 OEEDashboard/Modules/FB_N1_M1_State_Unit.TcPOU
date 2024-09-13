@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_N1_M1_State_Unit" Id="8cfcf6a4-494e-43c8-ba4e-b1c30b2b348b" SpecialFunc="None">
+    <Declaration><![CDATA[//New Lambda Function
+FUNCTION_BLOCK FB_N1_M1_State_Unit
+VAR_INPUT
+	nInput: UINT; 
+	bEnableExecution: BOOL := TRUE; 
+	tTimestamp: ULINT; 
+	bReset: BOOL; 
+	bReconfigure: BOOL := TRUE;
+	sString0: STRING(255); 
+	sString1: STRING(255); 
+	sString2: STRING(255); 
+	sString3: STRING(255); 
+	sString4: STRING(255); 
+	sString5: STRING(255); 
+	sString6: STRING(255); 
+	sString7: STRING(255); 
+	sString8: STRING(255); 
+	sString9: STRING(255); 
+	sString10: STRING(255); 
+	sString11: STRING(255); 
+	sString12: STRING(255); 
+	sString13: STRING(255); 
+	sString14: STRING(255); 
+	sString15: STRING(255); 
+	sString16: STRING(255); 
+	sString17: STRING(255); 
+	sString18: STRING(255); 
+	sString19: STRING(255); 
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+	sOutput: STRING(255);
+	bNewResult: BOOL;
+END_VAR
+VAR
+	bConfigured: BOOL;
+	R_TRIG_Reconfigure: R_TRIG;
+	
+	fbL1_Lf_CppModuleAssignString: FB_L1_Lf_CppModuleAssignString(nObjID:=16#01010120);
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="83d4771c-85fa-42ab-8082-827892ecffd8">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	nCurrentContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bConfigured THEN
+	bConfigured:= TRUE;
+
+	sString0:= 'Undefined';
+	sString1:= 'Clearing';
+	sString2:= 'Stopped';
+	sString3:= 'Starting';
+	sString4:= 'Idle';
+	sString5:= 'Suspended';
+	sString6:= 'Execute';
+	sString7:= 'Stopping';
+	sString8:= 'Aborting';
+	sString9:= 'Aborted';
+	sString10:= 'Holding';
+	sString11:= 'Held';
+	sString12:= 'Unholding';
+	sString13:= 'Suspending';
+	sString14:= 'Unsuspending';
+	sString15:= 'Resetting';
+	sString16:= 'Completing';
+	sString17:= 'Complete';
+	sString18:= '';
+	sString19:= '';
+END_IF
+
+R_TRIG_Reconfigure(CLK:= bReconfigure);
+IF R_TRIG_Reconfigure.Q THEN
+	fbL1_Lf_CppModuleAssignString.SetInitValues(
+		nInput:= nInput,
+		ntTimestamp:= tTimestamp,
+		bReset:= bReset,
+		bEnableExecution:= bEnableExecution,
+		pString0:= ADR(sString0),
+		pString1:= ADR(sString1),
+		pString2:= ADR(sString2),
+		pString3:= ADR(sString3),
+		pString4:= ADR(sString4),
+		pString5:= ADR(sString5),
+		pString6:= ADR(sString6),
+		pString7:= ADR(sString7),
+		pString8:= ADR(sString8),
+		pString9:= ADR(sString9),
+		pString10:= ADR(sString10),
+		pString11:= ADR(sString11),
+		pString12:= ADR(sString12),
+		pString13:= ADR(sString13),
+		pString14:= ADR(sString14),
+		pString15:= ADR(sString15),
+		pString16:= ADR(sString16),
+		pString17:= ADR(sString17),
+		pString18:= ADR(sString18),
+		pString19:= ADR(sString19));
+
+	bReconfigure:= FALSE;
+END_IF
+
+IF bReset THEN
+	Reset();
+END_IF
+
+IF bEnableExecution THEN
+	IF F_HasContext(nCurrentContext, nContext) THEN
+		fbL1_Lf_CppModuleAssignString.SetValues(
+			nInput:= nInput,
+			ntTimestamp:= tTimestamp,
+			bReset:= bReset,
+			bEnableExecution:= bEnableExecution,
+			pString0:= ADR(sString0),
+			pString1:= ADR(sString1),
+			pString2:= ADR(sString2),
+			pString3:= ADR(sString3),
+			pString4:= ADR(sString4),
+			pString5:= ADR(sString5),
+			pString6:= ADR(sString6),
+			pString7:= ADR(sString7),
+			pString8:= ADR(sString8),
+			pString9:= ADR(sString9),
+			pString10:= ADR(sString10),
+			pString11:= ADR(sString11),
+			pString12:= ADR(sString12),
+			pString13:= ADR(sString13),
+			pString14:= ADR(sString14),
+			pString15:= ADR(sString15),
+			pString16:= ADR(sString16),
+			pString17:= ADR(sString17),
+			pString18:= ADR(sString18),
+			pString19:= ADR(sString19));
+
+		fbL1_Lf_CppModuleAssignString.Call();
+
+		fbL1_Lf_CppModuleAssignString.GetResults(
+			pOutput:= ADR(sOutput),
+			pbNewResult:= ADR(bNewResult),
+			pString0:= ADR(sString0),
+			pString1:= ADR(sString1),
+			pString2:= ADR(sString2),
+			pString3:= ADR(sString3),
+			pString4:= ADR(sString4),
+			pString5:= ADR(sString5),
+			pString6:= ADR(sString6),
+			pString7:= ADR(sString7),
+			pString8:= ADR(sString8),
+			pString9:= ADR(sString9),
+			pString10:= ADR(sString10),
+			pString11:= ADR(sString11),
+			pString12:= ADR(sString12),
+			pString13:= ADR(sString13),
+			pString14:= ADR(sString14),
+			pString15:= ADR(sString15),
+			pString16:= ADR(sString16),
+			pString17:= ADR(sString17),
+			pString18:= ADR(sString18),
+			pString19:= ADR(sString19));
+
+		bNewResult:= fbL1_Lf_CppModuleAssignString.bNewResult;
+		bError:= fbL1_Lf_CppModuleAssignString.bError;
+		ipTcResult:= fbL1_Lf_CppModuleAssignString.ipTcResult;
+	END_IF
+ELSE
+	bNewResult:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="be7c8ac5-5cd4-4cab-bb66-a52da6e0e212">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Reset:= fbL1_Lf_CppModuleAssignString.Reset();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetHMI" Id="0846f4a2-27ad-4372-8689-9de399bb27f4">
+      <Declaration><![CDATA[METHOD SetHMI : BOOL
+VAR_INPUT
+	nContent: DINT;
+	pContent: PVOID;
+	bHMIReinit: BOOL;
+END_VAR
+VAR
+	pHMI_C1_OEE_Dashboard: POINTER TO ST_HMI_C1_OEE_Dashboard;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SetHMI:= FALSE;
+
+CASE nContent OF
+	1:
+		pHMI_C1_OEE_Dashboard:= pContent;
+
+		IF bHMIReinit AND bConfigured THEN
+			SetHMI:= TRUE;
+		END_IF
+
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl3_State_Unit.sM1_sOutput:= sOutput;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetHMI" Id="0ec5f946-15b9-4321-aaad-b13ff251e164">
+      <Declaration><![CDATA[METHOD GetHMI : BOOL
+VAR_INPUT
+	nContent: DINT;
+	pContent: PVOID;
+END_VAR
+VAR
+	pHMI_C1_OEE_Dashboard: POINTER TO ST_HMI_C1_OEE_Dashboard;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE nContent OF
+	1:
+		//OEE_Dashboard
+		pHMI_C1_OEE_Dashboard:= pContent;
+
+		IF pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl3_State_Unit.bTrigReconfigure THEN
+			pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl3_State_Unit.bTrigReconfigure:= FALSE;
+			bReconfigure:= TRUE;
+
+		END_IF
+END_CASE
+
+GetHMI:= bReconfigure;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="d169238b-61f3-4595-a338-befd15368106">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="5a7275dc-66e0-480a-88fe-218a71b59ed2">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= E_VirtualInput.eContext_V1_Virtual_Input_Source;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

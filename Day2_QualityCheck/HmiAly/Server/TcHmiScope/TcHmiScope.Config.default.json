@@ -1,0 +1,7 @@
+{
+    "CHUNKSIZE": 1048576,
+    "COMPRESSION": true,
+    "TIMEOUT": "PT5S",
+    "scopeConfigs": {},
+    "scopeRecords": []
+}

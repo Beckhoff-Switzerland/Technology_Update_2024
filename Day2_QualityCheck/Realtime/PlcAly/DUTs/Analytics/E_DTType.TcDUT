@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="E_DTType" Id="0f2ee2fb-d219-47cc-926f-4a8910bea3ed">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_DTType : 
+(
+	NotInitialized := 0,
+	BOOL_,
+	BYTE_,
+	WORD_,
+	DWORD_,
+	SINT_,
+	USINT_,
+	INT_,
+	UINT_,
+	DINT_,
+	UDINT_,
+	LINT_,
+	ULINT_,
+	REAL_,
+	LREAL_,
+	LWORD_
+) ;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

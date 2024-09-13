@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_DataSourceHistRecordInfo" Id="3ade016f-440b-4227-8f0f-961a28d79157">
+    <Declaration><![CDATA[TYPE ST_HMI_DataSourceHistRecordInfo : 
+STRUCT
+	nID: DINT;
+	sName: WSTRING(80);
+	sDisplayName: WSTRING(80);
+	dtRecordStart: DCTIMESTRUCT;
+	dtRecordEnd: DCTIMESTRUCT;
+	dtSelectedRangeStart: DCTIMESTRUCT;
+	dtSelectedRangeEnd: DCTIMESTRUCT;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

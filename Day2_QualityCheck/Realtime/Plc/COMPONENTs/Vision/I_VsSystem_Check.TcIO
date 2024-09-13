@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <Itf Name="I_VsSystem_Check" Id="{525a85fa-1c5f-476e-b723-c06c08d4b22a}">
+    <Declaration><![CDATA[INTERFACE I_VsSystem_Check
+]]></Declaration>
+    <Method Name="GetQualityRating" Id="{e4865c9c-8289-4ccf-ad62-a1549e9baf8c}">
+      <Declaration><![CDATA[METHOD GetQualityRating : I_CH_Feedback
+VAR_INPUT
+	nDcTrigger : T_DCTIME64;
+	nNbrHoles_Expected : LREAL;
+	fHoleDiameter : LREAL;
+END_VAR
+VAR_OUTPUT
+	bQualityGood : BOOL;
+	nNbrHoles_Found : LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

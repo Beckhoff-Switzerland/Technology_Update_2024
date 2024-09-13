@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <DUT Name="ST_HMI_C1_Ctrl2_Machine_Learning_Calculation_Duration" Id="03a80529-94d6-4361-9c43-2a863b8b11e5">
+    <Declaration><![CDATA[TYPE ST_HMI_C1_Ctrl2_Machine_Learning_Calculation_Duration : 
+STRUCT
+	//Machine Learning Calculation Duration
+	bTrigReconfigure: BOOL;
+	nM7_nDataIn: UDINT; //Actual Value
+	fM7_fMin: LREAL; //Min Value
+	fM7_fMax: LREAL; //Max Value
+	fM7_fAvg: LREAL; //Avg Value
+	tM7_fbTimeMin: DCTIMESTRUCT; //Last Event Min
+	tM7_fbTimeMax: DCTIMESTRUCT; //Last Event Max
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

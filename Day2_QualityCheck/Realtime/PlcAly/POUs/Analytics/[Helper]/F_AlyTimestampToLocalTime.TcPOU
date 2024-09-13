@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_AlyTimestampToLocalTime" Id="7edab494-d881-481f-9e5e-c1ee1f83aca8" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_AlyTimestampToLocalTime : ULINT
+VAR_INPUT
+	tTimestamp: ULINT;
+END_VAR
+VAR
+	tFileTime: T_FILETIME;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[tFileTime:= DCTIME64_TO_Filetime(tTimestamp);
+F_AlyTimestampToLocalTime:= ULARGE_TO_ULINT(ULARGE_INTEGER(tFileTime.dwHighDateTime, tFileTime.dwLowDateTime));]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

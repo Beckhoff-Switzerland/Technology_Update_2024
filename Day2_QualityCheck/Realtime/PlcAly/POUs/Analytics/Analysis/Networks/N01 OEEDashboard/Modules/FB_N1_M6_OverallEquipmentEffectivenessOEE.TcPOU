@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_N1_M6_OverallEquipmentEffectivenessOEE" Id="2b123d4d-f8c9-495f-93ae-a137429f6699" SpecialFunc="None">
+    <Declaration><![CDATA[//The Overall Equipment Effectiveness (OEE) algorithm calculates key values to compare the current manufacturing process with its full potential. Optional a boolean signal for Enable Execution can be selected, so that the algorithm is just active if the value of the selected signal is TRUE.
+FUNCTION_BLOCK FB_N1_M6_OverallEquipmentEffectivenessOEE
+VAR_INPUT
+	tScheduledTime: LINT; 
+	tOperatingTime: LINT; 
+	nUnitsProduced: ULINT; 
+	nDefectiveUnits: ULINT; 
+	tTimestamp: ULINT; 
+	bEnableExecution: BOOL := TRUE; 
+	bReset: BOOL; 
+	bReconfigure: BOOL := TRUE;
+END_VAR
+VAR_INPUT PERSISTENT
+	tIdealCycleTime: LTIME; 
+	fThresholdLevelOkWarning: LREAL; 
+	fThresholdLevelWarningAlarm: LREAL; 
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+	bNewResult: BOOL;
+	fOEE: LREAL;
+	eOeeClass: E_ALY_Classification_3Cls;
+	fAvailability: LREAL;
+	fPerformance: LREAL;
+	fQuality: LREAL;
+	fbTimeOeeEventWarning: FB_ALY_DateTime;
+	fbTimeOeeEventAlarm: FB_ALY_DateTime;
+END_VAR
+VAR
+	
+	R_TRIG_Reconfigure: R_TRIG;
+	
+	fbALY_OverallEquipmentEffectiveness: FB_ALY_OverallEquipmentEffectiveness;
+END_VAR
+VAR PERSISTENT
+	bConfigured: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="8665d140-815c-449f-9d02-4e06195a3296">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	nCurrentContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bConfigured THEN
+	bConfigured:= TRUE;
+
+	tIdealCycleTime:= LTIME#750000000ns;
+	fThresholdLevelOkWarning:= 90;
+	fThresholdLevelWarningAlarm:= 75;
+
+END_IF
+
+R_TRIG_Reconfigure(CLK:= bReconfigure);
+IF R_TRIG_Reconfigure.Q THEN
+	fbALY_OverallEquipmentEffectiveness.Configure(tIdealCycleTime:= tIdealCycleTime, fThresholdLevelOkWarning:= fThresholdLevelOkWarning, fThresholdLevelWarningAlarm:= fThresholdLevelWarningAlarm);
+
+	bReconfigure:= FALSE;
+END_IF
+
+IF bReset THEN
+	Reset();
+END_IF
+
+IF bEnableExecution THEN
+	IF F_HasContext(nCurrentContext, nContext) THEN
+		fbALY_OverallEquipmentEffectiveness.SetChannelValue(nChannel:= 1, Input:= tScheduledTime);
+		fbALY_OverallEquipmentEffectiveness.SetChannelValue(nChannel:= 2, Input:= tOperatingTime);
+		fbALY_OverallEquipmentEffectiveness.SetChannelValue(nChannel:= 3, Input:= nUnitsProduced);
+		fbALY_OverallEquipmentEffectiveness.SetChannelValue(nChannel:= 4, Input:= nDefectiveUnits);
+
+		fbALY_OverallEquipmentEffectiveness.Call(tTimestamp:= tTimestamp);
+
+		bNewResult:= fbALY_OverallEquipmentEffectiveness.bNewResult;
+		fOEE:= fbALY_OverallEquipmentEffectiveness.fOEE;
+		eOeeClass:= fbALY_OverallEquipmentEffectiveness.eOeeClass;
+		fAvailability:= fbALY_OverallEquipmentEffectiveness.fAvailability;
+		fPerformance:= fbALY_OverallEquipmentEffectiveness.fPerformance;
+		fQuality:= fbALY_OverallEquipmentEffectiveness.fQuality;
+		fbTimeOeeEventWarning:= fbALY_OverallEquipmentEffectiveness.fbTimeOeeEventWarning;
+		fbTimeOeeEventAlarm:= fbALY_OverallEquipmentEffectiveness.fbTimeOeeEventAlarm;
+
+		bError:= fbALY_OverallEquipmentEffectiveness.bError;
+		ipTcResult:= fbALY_OverallEquipmentEffectiveness.ipResultMessage;
+	END_IF
+ELSE
+	bNewResult:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="33200d45-f8c3-4b00-9383-fc4cd1889d69">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Reset:= fbALY_OverallEquipmentEffectiveness.Reset();
+
+bNewResult:= fbALY_OverallEquipmentEffectiveness.bNewResult;
+fOEE:= fbALY_OverallEquipmentEffectiveness.fOEE;
+eOeeClass:= fbALY_OverallEquipmentEffectiveness.eOeeClass;
+fAvailability:= fbALY_OverallEquipmentEffectiveness.fAvailability;
+fPerformance:= fbALY_OverallEquipmentEffectiveness.fPerformance;
+fQuality:= fbALY_OverallEquipmentEffectiveness.fQuality;
+fbTimeOeeEventWarning:= fbALY_OverallEquipmentEffectiveness.fbTimeOeeEventWarning;
+fbTimeOeeEventAlarm:= fbALY_OverallEquipmentEffectiveness.fbTimeOeeEventAlarm;
+
+bError:= NOT Reset;
+ipTcResult:= fbALY_OverallEquipmentEffectiveness.ipResultMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetHMI" Id="6d2bdea9-1a5f-49f3-82fd-d9842b7683f2">
+      <Declaration><![CDATA[METHOD SetHMI : BOOL
+VAR_INPUT
+	nContent: DINT;
+	pContent: PVOID;
+	bHMIReinit: BOOL;
+END_VAR
+VAR
+	pHMI_C1_OEE_Dashboard: POINTER TO ST_HMI_C1_OEE_Dashboard;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SetHMI:= FALSE;
+
+CASE nContent OF
+	1:
+		pHMI_C1_OEE_Dashboard:= pContent;
+
+		IF bHMIReinit AND bConfigured THEN
+			pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fThresholdLevelOkWarning:= fThresholdLevelOkWarning;
+			pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fThresholdLevelWarningAlarm:= fThresholdLevelWarningAlarm;
+			SetHMI:= TRUE;
+		END_IF
+
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fOEE:= fOEE;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fAvailability:= fAvailability;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fPerformance:= fPerformance;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fQuality:= fQuality;
+		pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.eM6_eOeeClass:= eOeeClass;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetHMI" Id="3672cb2c-f9a0-4100-a9c2-555b3da06724">
+      <Declaration><![CDATA[METHOD GetHMI : BOOL
+VAR_INPUT
+	nContent: DINT;
+	pContent: PVOID;
+END_VAR
+VAR
+	pHMI_C1_OEE_Dashboard: POINTER TO ST_HMI_C1_OEE_Dashboard;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE nContent OF
+	1:
+		//OEE_Dashboard
+		pHMI_C1_OEE_Dashboard:= pContent;
+
+		IF pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.bTrigReconfigure THEN
+			pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.bTrigReconfigure:= FALSE;
+			bReconfigure:= TRUE;
+
+			fThresholdLevelOkWarning:= pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fThresholdLevelOkWarning;
+			fThresholdLevelWarningAlarm:= pHMI_C1_OEE_Dashboard^.stHMI_C1_Ctrl1_Overall_Equipment_Effectiveness_OEE.fM6_fThresholdLevelWarningAlarm;
+		END_IF
+END_CASE
+
+GetHMI:= bReconfigure;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="709a75d6-a4e7-42c7-815f-550043124adf">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="a2e98a8b-3f83-4e8f-b029-93cf86b9c1a8">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= E_VirtualInput.eContext_V1_Virtual_Input_Source;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Task Name="PlcTask" Id="{5b1b7453-d97c-4298-a669-91a2ec5112b5}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>1000</CycleTime>
+    <Priority>5</Priority>
+    <PouCall>
+      <Name>PRG_ProcessCellSimulation</Name>
+    </PouCall>
+    <TaskFBGuid>{dd03e50c-b88d-4338-a173-23f4bdd5b99a}</TaskFBGuid>
+    <Fb_init>{86ec0dde-f813-4940-8d54-c31dc96cc70f}</Fb_init>
+    <Fb_exit>{2eac9617-b0ce-425b-9ca7-aa6b3b287250}</Fb_exit>
+    <CycleUpdate>{1f981671-a224-4201-8dfa-0932fc9ceffd}</CycleUpdate>
+    <PostCycleUpdate>{b9f68e5f-1dfd-4f5a-ab2b-ce93faea3302}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

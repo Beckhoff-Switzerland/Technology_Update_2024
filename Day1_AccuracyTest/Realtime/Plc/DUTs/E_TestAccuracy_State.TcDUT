@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="E_TestAccuracy_State" Id="{7c1c0a77-4569-4502-b97d-94e69b06312f}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_TestAccuracy_State :
+(
+	IDLE := 0,
+	MOVE_TO_FIRST_POS,
+	WAIT_MOVE_TO_FIRST_POS,
+	MOVE_TO_TARGET_FORWARD,
+	WAIT_MOVE_TO_TARGET_FORWARD,
+	MOVE_TO_LAST_POS,
+	WAIT_MOVE_TO_LAST_POS,
+	MOVE_TO_TARGET_BACKWARD,
+	WAIT_MOVE_TO_TARGET_BACKWARD,
+	DONE
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

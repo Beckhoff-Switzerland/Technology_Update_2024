@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Task Name="VisionTask" Id="{1e7a0f27-4081-47ec-903a-a97a7ffd3e0b}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>10000</CycleTime>
+    <Priority>11</Priority>
+    <PouCall>
+      <Name>PRG_Vision</Name>
+    </PouCall>
+    <TaskFBGuid>{486fef71-a794-4b82-abb0-2a9e8f7ab4df}</TaskFBGuid>
+    <Fb_init>{e26b9704-8d27-493e-8670-f29669d1d6f6}</Fb_init>
+    <Fb_exit>{830d58dd-a29a-4c61-b11e-7eb3af5de215}</Fb_exit>
+    <CycleUpdate>{33297c85-3318-41a3-95a7-fc445ca60329}</CycleUpdate>
+    <PostCycleUpdate>{3531d6d6-c271-42b0-8d19-28b48f262f3e}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

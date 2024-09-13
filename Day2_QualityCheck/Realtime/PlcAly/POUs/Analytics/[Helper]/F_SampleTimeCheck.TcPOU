@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="F_SampleTimeCheck" Id="0faa84e9-754e-428d-ae6f-ebebaf33b37a" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_SampleTimeCheck : BOOL
+VAR_INPUT
+	nSampleTimestamp: ULINT;
+	nLastSampleTimestamp: ULINT;
+	nSampleTime: UDINT;
+END_VAR
+VAR
+	nDeviation: UDINT := 500000; //Allowed deviation 0.5ms
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF nLastSampleTimestamp = 0 THEN
+	F_SampleTimeCheck:= TRUE;
+ELSIF nSampleTimestamp >= (nLastSampleTimestamp + (nSampleTime + nDeviation)) THEN
+	F_SampleTimeCheck:= TRUE;
+ELSIF nSampleTimestamp >= (nLastSampleTimestamp + (nSampleTime - nDeviation)) THEN
+	F_SampleTimeCheck:= TRUE;
+ELSE
+	F_SampleTimeCheck:= FALSE;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Itf Name="I_StationProcess" Id="{186b54bc-4cfe-4388-a319-b3213386405b}">
+    <Declaration><![CDATA[INTERFACE I_StationProcess
+]]></Declaration>
+    <Property Name="SetOpMode" Id="{ce96595a-cc7b-45eb-9684-4d775a0b6136}">
+      <Declaration><![CDATA[PROPERTY SetOpMode : E_OpMode]]></Declaration>
+      <Set Name="Set" Id="{104f3592-9932-4629-9328-28cb58cfd36e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="State" Id="{893fa886-f71f-49d4-b79f-41ce9b10ddb8}">
+      <Declaration><![CDATA[PROPERTY State : E_StationProcessState]]></Declaration>
+      <Get Name="Get" Id="{f9b4a8d9-39f5-4ac1-b692-cb7caa168642}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{6361f94d-3861-47a5-bfb0-4cd95f6738da}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Method Name="Update" Id="{98b90e30-ef9e-42d9-ba1b-b560b7f75cb0}">
+      <Declaration><![CDATA[METHOD Update
+VAR_INPUT
+	iStation : I_XTS_Station_PLC;	
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

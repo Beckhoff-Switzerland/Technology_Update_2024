@@ -1,0 +1,351 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.2.0.0" ProductVersion="3.1.4024.13">
+  <POU Name="FB_L1_Lf_CppModuleAssignString" Id="{030ba20b-543c-4061-8c3e-f58d45715765}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_L1_Lf_CppModuleAssignString
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage := fbTcMessage;
+	bNewResult: BOOL;
+END_VAR
+VAR
+	hr: HRESULT;
+	stEventEntry: TcEventEntry;
+	
+	fbTcMessage: FB_TcMessage;
+	fbSrceInfo: FB_TcSourceInfo;
+	
+	ipLambda: ILf_CppModuleAssignString;
+	iidLambda: IID := TC_GLOBAL_IID_LIST.IID_ILf_CppModuleAssignString;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="{7fcbdc5a-ce11-4fb6-9181-821ce64894e7}">
+      <Declaration><![CDATA[//returns TRUE if succeeded
+METHOD Call : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF ipLambda <> 0 THEN
+	hr:= ipLambda.Call();
+
+	bError:= FAILED(hr);
+	IF HRESULTAdsErr_TO_TcEventEntry(hr, stEventEntry) THEN
+		fbTcMessage.CreateEx(stEventEntry, fbSrceInfo);
+	END_IF
+
+	bNewResult:= FALSE;
+
+	Call:= NOT bError;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateInstance" Id="{394c0a10-41f7-41dd-b1d7-954c26c86299}">
+      <Declaration><![CDATA[METHOD CreateInstance : BOOL
+VAR_INPUT
+	nObjID: OTCID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF ipLambda = 0 THEN
+	IF nObjID <> 0 THEN
+		hr:= FW_ObjMgr_GetObjectInstance(oid:=nObjID, iid:=iidLambda, pipUnk:=ADR(ipLambda));
+	ELSE
+		hr:= E_HRESULTAdsErr.INVALIDOBJID;
+	END_IF
+
+	bError:= FAILED(hr);
+	IF HRESULTAdsErr_TO_TcEventEntry(hr, stEventEntry) THEN
+		fbTcMessage.CreateEx(stEventEntry, fbSrceInfo);
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_exit" Id="{edbdbcb4-65ba-4cbf-9250-9de8289eb068}">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode: BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN //if not online change
+	FW_SafeRelease(ADR(ipLambda));
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{909b5102-f76c-4533-9b7d-745e3ddb3c90}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains: BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode: BOOL; // if TRUE, the instance afterwards gets moved into the copy code (online change)
+	nObjID: OTCID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN //if not online change
+	IF nObjID <> 0 THEN
+		CreateInstance(nObjID:= nObjID);
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetResults" Id="{8289392a-d2e3-42ea-b29b-c835a3607d08}">
+      <Declaration><![CDATA[//returns TRUE if succeeded
+METHOD GetResults : BOOL
+VAR_INPUT
+	pOutput: POINTER TO STRING(255);
+	pbNewResult: POINTER TO BOOL;
+	pString0: POINTER TO STRING(255);
+	pString1: POINTER TO STRING(255);
+	pString2: POINTER TO STRING(255);
+	pString3: POINTER TO STRING(255);
+	pString4: POINTER TO STRING(255);
+	pString5: POINTER TO STRING(255);
+	pString6: POINTER TO STRING(255);
+	pString7: POINTER TO STRING(255);
+	pString8: POINTER TO STRING(255);
+	pString9: POINTER TO STRING(255);
+	pString10: POINTER TO STRING(255);
+	pString11: POINTER TO STRING(255);
+	pString12: POINTER TO STRING(255);
+	pString13: POINTER TO STRING(255);
+	pString14: POINTER TO STRING(255);
+	pString15: POINTER TO STRING(255);
+	pString16: POINTER TO STRING(255);
+	pString17: POINTER TO STRING(255);
+	pString18: POINTER TO STRING(255);
+	pString19: POINTER TO STRING(255);
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF ipLambda <> 0 THEN
+	hr:= ipLambda.GetResults(
+	Output:= pOutput,
+	bNewResult:= pbNewResult,
+	String0:= pString0,
+	String1:= pString1,
+	String2:= pString2,
+	String3:= pString3,
+	String4:= pString4,
+	String5:= pString5,
+	String6:= pString6,
+	String7:= pString7,
+	String8:= pString8,
+	String9:= pString9,
+	String10:= pString10,
+	String11:= pString11,
+	String12:= pString12,
+	String13:= pString13,
+	String14:= pString14,
+	String15:= pString15,
+	String16:= pString16,
+	String17:= pString17,
+	String18:= pString18,
+	String19:= pString19);
+
+	bError:= FAILED(hr);
+	IF HRESULTAdsErr_TO_TcEventEntry(hr, stEventEntry) THEN
+		fbTcMessage.CreateEx(stEventEntry, fbSrceInfo);
+	END_IF
+
+	bNewResult:= NOT bError;
+
+	GetResults:= NOT bError;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{57cd5b0b-0543-4ac4-883f-4980374d18da}">
+      <Declaration><![CDATA[//returns TRUE if succeeded
+METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF ipLambda <> 0 THEN
+	hr:= ipLambda.Reset();
+
+	bError:= FAILED(hr);
+	IF HRESULTAdsErr_TO_TcEventEntry(hr, stEventEntry) THEN
+		fbTcMessage.CreateEx(stEventEntry, fbSrceInfo);
+	END_IF
+
+	Reset:= NOT bError;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetInitValues" Id="{a1801f54-9a9d-404b-944b-f53c97f3f478}">
+      <Declaration><![CDATA[//returns TRUE if succeeded
+METHOD SetInitValues : BOOL
+VAR_INPUT
+	nInput: UINT;
+	ntTimestamp: ULINT;
+	bReset: BOOL;
+	bEnableExecution: BOOL;
+	pString0: POINTER TO STRING(255);
+	pString1: POINTER TO STRING(255);
+	pString2: POINTER TO STRING(255);
+	pString3: POINTER TO STRING(255);
+	pString4: POINTER TO STRING(255);
+	pString5: POINTER TO STRING(255);
+	pString6: POINTER TO STRING(255);
+	pString7: POINTER TO STRING(255);
+	pString8: POINTER TO STRING(255);
+	pString9: POINTER TO STRING(255);
+	pString10: POINTER TO STRING(255);
+	pString11: POINTER TO STRING(255);
+	pString12: POINTER TO STRING(255);
+	pString13: POINTER TO STRING(255);
+	pString14: POINTER TO STRING(255);
+	pString15: POINTER TO STRING(255);
+	pString16: POINTER TO STRING(255);
+	pString17: POINTER TO STRING(255);
+	pString18: POINTER TO STRING(255);
+	pString19: POINTER TO STRING(255);
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF ipLambda <> 0 THEN
+	hr:= ipLambda.SetInitValues(
+	Input:= nInput,
+	tTimestamp:= ntTimestamp,
+	bReset:= bReset,
+	bEnableExecution:= bEnableExecution,
+	String0:= pString0,
+	String1:= pString1,
+	String2:= pString2,
+	String3:= pString3,
+	String4:= pString4,
+	String5:= pString5,
+	String6:= pString6,
+	String7:= pString7,
+	String8:= pString8,
+	String9:= pString9,
+	String10:= pString10,
+	String11:= pString11,
+	String12:= pString12,
+	String13:= pString13,
+	String14:= pString14,
+	String15:= pString15,
+	String16:= pString16,
+	String17:= pString17,
+	String18:= pString18,
+	String19:= pString19);
+
+	bError:= FAILED(hr);
+	IF HRESULTAdsErr_TO_TcEventEntry(hr, stEventEntry) THEN
+		fbTcMessage.CreateEx(stEventEntry, fbSrceInfo);
+	END_IF
+
+	SetInitValues:= NOT bError;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetValues" Id="{74e13c8c-d447-4d9b-8a3f-555188ca83f1}">
+      <Declaration><![CDATA[//returns TRUE if succeeded
+METHOD SetValues : BOOL
+VAR_INPUT
+	nInput: UINT;
+	ntTimestamp: ULINT;
+	bReset: BOOL;
+	bEnableExecution: BOOL;
+	pString0: POINTER TO STRING(255);
+	pString1: POINTER TO STRING(255);
+	pString2: POINTER TO STRING(255);
+	pString3: POINTER TO STRING(255);
+	pString4: POINTER TO STRING(255);
+	pString5: POINTER TO STRING(255);
+	pString6: POINTER TO STRING(255);
+	pString7: POINTER TO STRING(255);
+	pString8: POINTER TO STRING(255);
+	pString9: POINTER TO STRING(255);
+	pString10: POINTER TO STRING(255);
+	pString11: POINTER TO STRING(255);
+	pString12: POINTER TO STRING(255);
+	pString13: POINTER TO STRING(255);
+	pString14: POINTER TO STRING(255);
+	pString15: POINTER TO STRING(255);
+	pString16: POINTER TO STRING(255);
+	pString17: POINTER TO STRING(255);
+	pString18: POINTER TO STRING(255);
+	pString19: POINTER TO STRING(255);
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF ipLambda <> 0 THEN
+	hr:= ipLambda.SetValues(
+	Input:= nInput,
+	tTimestamp:= ntTimestamp,
+	bReset:= bReset,
+	bEnableExecution:= bEnableExecution,
+	String0:= pString0,
+	String1:= pString1,
+	String2:= pString2,
+	String3:= pString3,
+	String4:= pString4,
+	String5:= pString5,
+	String6:= pString6,
+	String7:= pString7,
+	String8:= pString8,
+	String9:= pString9,
+	String10:= pString10,
+	String11:= pString11,
+	String12:= pString12,
+	String13:= pString13,
+	String14:= pString14,
+	String15:= pString15,
+	String16:= pString16,
+	String17:= pString17,
+	String18:= pString18,
+	String19:= pString19);
+
+	bError:= FAILED(hr);
+	IF HRESULTAdsErr_TO_TcEventEntry(hr, stEventEntry) THEN
+		fbTcMessage.CreateEx(stEventEntry, fbSrceInfo);
+	END_IF
+
+	SetValues:= NOT bError;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.Call">
+      <LineId Id="3" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.CreateInstance">
+      <LineId Id="3" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.FB_exit">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.FB_init">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.GetResults">
+      <LineId Id="3" Count="32" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.Reset">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.SetInitValues">
+      <LineId Id="3" Count="32" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_L1_Lf_CppModuleAssignString.SetValues">
+      <LineId Id="3" Count="32" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

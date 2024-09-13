@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="scaling" Id="{9728d94c-cc60-407b-8e4d-6483ead09ef5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION scaling : LREAL
+VAR_INPUT
+	fInput : LREAL;
+	fScalingNum : LREAL;
+	fScalingDenum : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Scaling := fInput * (fScalingNum / fScalingDenum);]]></ST>
+    </Implementation>
+    <LineIds Name="scaling">
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

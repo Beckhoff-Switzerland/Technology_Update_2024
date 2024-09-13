@@ -1,0 +1,204 @@
+<div id="Diagnostics" data-tchmi-type="TcHmi.Controls.System.TcHmiContent" data-tchmi-top="0" data-tchmi-left="0" data-tchmi-width="100" data-tchmi-height="100" data-tchmi-width-unit="%" data-tchmi-height-unit="%">
+<div id="TcHmiVnImage" data-tchmi-type="TcHmi.Controls.Beckhoff.Vision.TcHmiVnImage" data-tchmi-data-rate="0" data-tchmi-data-received="0" data-tchmi-draggable="true" data-tchmi-height="819" data-tchmi-height-unit="px" data-tchmi-image-rate="0" data-tchmi-image-render-time="0" data-tchmi-images-received="0" data-tchmi-left="0" data-tchmi-left-unit="px" data-tchmi-scalable="true" data-tchmi-scale="100" data-tchmi-scale-max="250" data-tchmi-scale-min="10" data-tchmi-top="0" data-tchmi-top-unit="px" data-tchmi-width="986" data-tchmi-width-unit="px" data-tchmi-image="%s%Image_Result|Interval=200%/s%" data-tchmi-pixel-info-update="AtClick" data-tchmi-creator-visibility="Visible">
+<script data-tchmi-target-attribute="data-tchmi-offset" type="application/json">
+[
+  0,
+  0
+]
+</script>
+<script data-tchmi-target-attribute="data-tchmi-view" type="application/json">
+[
+  0,
+  0,
+  0,
+  0
+]
+</script>
+<script data-tchmi-target-attribute="data-tchmi-pixel-color-format" type="application/json">
+{
+  "objectType": "Function",
+  "fn": "PixelColorFormatter",
+  "fnParams": []
+}
+</script>
+<script data-tchmi-target-attribute="data-tchmi-shape-value-format" type="application/json">
+{
+  "objectType": "Function",
+  "fn": "ShapeValueFormatter",
+  "fnParams": []
+}
+</script>
+
+
+<script data-tchmi-target-attribute="data-tchmi-trigger" type="application/json">
+[
+  {
+    "event": "TcHmiVnImage.onAttached",
+    "actions": [
+      {
+        "objectType": "ControlApiFunction",
+        "active": true,
+        "control": "TcHmiVnImage",
+        "fn": "fitImageToControl",
+        "fnParams": [
+          {
+            "objectType": "StaticValue",
+            "valueType": "tchmi:general#/definitions/Boolean",
+            "value": true
+          }
+        ],
+        "asyncWait": true
+      }
+    ]
+  }
+]
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-border-width" type="application/json">
+{
+  "left": 1,
+  "right": 1,
+  "top": 1,
+  "bottom": 1,
+  "leftUnit": "px",
+  "rightUnit": "px",
+  "topUnit": "px",
+  "bottomUnit": "px"
+}
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-border-style" type="application/json">
+{
+  "left": "Dotted",
+  "right": "Dotted",
+  "top": "Dotted",
+  "bottom": "Dotted"
+}
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-toolbar-items" type="application/json">
+{
+  "imageSelectionVisible": true,
+  "scaleSelectionVisible": true,
+  "shapeButtonVisible": true,
+  "freezeButtonVisible": true,
+  "downloadButtonVisible": true
+}
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-infobar-items" type="application/json">
+{
+  "shapeValueVisible": true,
+  "pixelColorVisible": true,
+  "pixelPositionVisible": true,
+  "imageSizeVisible": true
+}
+</script>
+</div>
+<div id="TcHmiVnImage_1" data-tchmi-type="TcHmi.Controls.Beckhoff.Vision.TcHmiVnImage" data-tchmi-data-rate="0" data-tchmi-data-received="0" data-tchmi-draggable="true" data-tchmi-height="819" data-tchmi-height-unit="px" data-tchmi-image-rate="0" data-tchmi-image-render-time="0" data-tchmi-images-received="0" data-tchmi-left="1000" data-tchmi-left-unit="px" data-tchmi-scalable="true" data-tchmi-scale="100" data-tchmi-scale-max="250" data-tchmi-scale-min="10" data-tchmi-top="0" data-tchmi-top-unit="px" data-tchmi-width="986" data-tchmi-width-unit="px" data-tchmi-image="%s%Image_Work|Interval=200%/s%" data-tchmi-pixel-info-update="AtClick" data-tchmi-thumbnail-visible="false">
+<script data-tchmi-target-attribute="data-tchmi-offset" type="application/json">
+[
+  0,
+  0
+]
+</script>
+<script data-tchmi-target-attribute="data-tchmi-view" type="application/json">
+[
+  0,
+  0,
+  0,
+  0
+]
+</script>
+<script data-tchmi-target-attribute="data-tchmi-pixel-color-format" type="application/json">
+{
+  "objectType": "Function",
+  "fn": "PixelColorFormatter",
+  "fnParams": []
+}
+</script>
+<script data-tchmi-target-attribute="data-tchmi-shape-value-format" type="application/json">
+{
+  "objectType": "Function",
+  "fn": "ShapeValueFormatter",
+  "fnParams": []
+}
+</script>
+
+
+<script data-tchmi-target-attribute="data-tchmi-trigger" type="application/json">
+[
+  {
+    "event": "TcHmiVnImage_1.onAttached",
+    "actions": [
+      {
+        "objectType": "ControlApiFunction",
+        "active": true,
+        "control": "TcHmiVnImage_1",
+        "fn": "fitImageToControl",
+        "fnParams": [
+          {
+            "objectType": "StaticValue",
+            "valueType": "tchmi:general#/definitions/Boolean",
+            "value": true
+          }
+        ],
+        "asyncWait": true
+      }
+    ]
+  }
+]
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-border-width" type="application/json">
+{
+  "left": 1,
+  "right": 1,
+  "top": 1,
+  "bottom": 1,
+  "leftUnit": "px",
+  "rightUnit": "px",
+  "topUnit": "px",
+  "bottomUnit": "px"
+}
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-border-style" type="application/json">
+{
+  "left": "Dotted",
+  "right": "Dotted",
+  "top": "Dotted",
+  "bottom": "Dotted"
+}
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-toolbar-items" type="application/json">
+{
+  "imageSelectionVisible": true,
+  "scaleSelectionVisible": true,
+  "shapeButtonVisible": true,
+  "freezeButtonVisible": true,
+  "downloadButtonVisible": true
+}
+</script>
+
+<script data-tchmi-target-attribute="data-tchmi-infobar-items" type="application/json">
+{
+  "shapeValueVisible": true,
+  "pixelColorVisible": true,
+  "pixelPositionVisible": true,
+  "imageSizeVisible": true
+}
+</script>
+
+
+
+
+
+<script data-tchmi-target-attribute="data-tchmi-background-color" type="application/json">
+{
+  "color": "None"
+}
+</script>
+</div>
+</div>

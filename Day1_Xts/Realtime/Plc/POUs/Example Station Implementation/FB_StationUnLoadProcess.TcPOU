@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_StationUnLoadProcess" Id="{b3f5f9c5-01e3-46ca-b1e0-e512c913f266}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_StationUnLoadProcess EXTENDS FB_StationBase
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Update" Id="{b1bfb058-f696-4d12-8056-002f8d2c337f}">
+      <Declaration><![CDATA[METHOD Update
+VAR_INPUT
+	iStation : I_XTS_Station_PLC;
+END_VAR
+VAR_INST
+	fbTonDelay : ton;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Update(iStation := iStation);
+
+CASE nState OF
+	E_StationProcessState.Idle:
+		;
+		
+	E_StationProcessState.ProcessStart:
+		nState := E_StationProcessState.ProcessBusy;
+		
+	E_StationProcessState.ProcessBusy:
+		fbTonDelay(In:= TRUE, PT:= T#250MS);
+		IF fbTonDelay.Q THEN
+			fbTonDelay(In:= FALSE);
+			nState := E_StationProcessState.ProcessDone;			
+		END_IF
+		
+	E_StationProcessState.ProcessDone:
+		CASE eOpMode OF
+			E_OpMode.Simulation:
+				; // wait nothing to do
+			E_OpMode.Auto, E_OpMode.Calibration:
+				main.iXtsSystem.Station('Unloading').SendMoversToStation('Loading');
+		END_CASE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

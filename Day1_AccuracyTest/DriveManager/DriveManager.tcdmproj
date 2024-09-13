@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Name>Drive Manager 2</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5782b67a-45da-436c-85cc-6bb353e267d2}</ProjectGuid>
+    <TcPath>
+    </TcPath>
+    <AssemblyName>TwinCAT Drive Manager 2 Project1</AssemblyName>
+    <RootNamespace>TwinCAT Drive Manager 2 Project1</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Term 6 %28AX8620-0000-0103%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Term 6 %28AX8620-0000-0103%29\Drive 7 %28AX8206-0210-0106%29.tcdmdrv">
+      <SubType>Content</SubType>
+      <DependentUpon>Term 6 (AX8620-0000-0103).tcdmdrv</DependentUpon>
+    </Content>
+  </ItemGroup>
+</Project>

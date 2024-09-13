@@ -1,0 +1,14 @@
+<div id="StartPage" data-tchmi-type="TcHmi.Controls.System.TcHmiContent" data-tchmi-top="0" data-tchmi-left="0" data-tchmi-width="100" data-tchmi-height="100" data-tchmi-width-unit="%" data-tchmi-height-unit="%">
+
+<div id="AlyLeafletMapCtrl" data-tchmi-type="TcHmi.Controls.Analytics.MapControl" data-tchmi-show-title="False" data-tchmi-name-alias="Map Control" data-tchmi-color-gradient="0" data-tchmi-amount-decimals="2" data-tchmi-show-edit-properties="false" data-tchmi-edit-properties-alias="%l%ACEditProperties%/l%" data-tchmi-show-reset="false" data-tchmi-left="5" data-tchmi-top="5" data-tchmi-right="5" data-tchmi-bottom="20" data-tchmi-map-input="%s%PLC1.AnalyticsHMI.aMapItems%/s%">
+
+<script data-tchmi-target-attribute="data-tchmi-map-input" type="application/json">
+[
+  {
+    "sPosition": "Beckhoff Automation, Verl",
+    "nStatus": "0",
+    "sDescription": "",
+    "sName": "Beckhoff Automation"
+  }
+]
+</script><script data-tchmi-target-attribute="data-tchmi-class-names" type="application/json">["Default"]</script></div></div>

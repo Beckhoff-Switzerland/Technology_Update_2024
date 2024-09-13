@@ -1,0 +1,148 @@
+﻿<AnalyticsProjectResult StartTime="9/5/2024 05:00:48.707:000 PM" StartTimeValue="133700220487070000" EndTime="9/5/2024 05:04:24.772:000 PM" EndTimeValue="133700222647720000">
+  <Functions>
+    <Function Title="State_Execute" Name="CTcAlyTimingAnalysis_1Ch">
+      <InputLinks>
+        <InputLink InputTitle="Input">GVL_Components.fbMachine.stOEE_Analytics.nState @ localhost: DefaultMainTopic/PlcStream1 [1.00ms]</InputLink>
+      </InputLinks>
+      <Parameters>
+        <Parameter Title="Persistent Results">TRUE</Parameter>
+        <Parameter Title="Operator Level On">Equals</Parameter>
+        <Parameter Title="Threshold LevelOn">6</Parameter>
+        <Parameter Title="Tolerance">0</Parameter>
+        <Parameter Title="Negate Input">FALSE</Parameter>
+        <Parameter Title="Negate Enable Execution">FALSE</Parameter>
+        <Parameter Title="Negate Reset">FALSE</Parameter>
+      </Parameters>
+      <Outputs>
+        <Output Title="New Result">0</Output>
+        <Output Title="Is On">True</Output>
+        <Output Title="Current Interval">00:00:38:049</Output>
+        <Output Title="On Total">00:00:38:049</Output>
+        <Output Title="Off Total">00:00:00:000</Output>
+        <Output Title="Count On">1</Output>
+      </Outputs>
+    </Function>
+    <Function Title="State_Aborted" Name="CTcAlyTimingAnalysis_1Ch_Instance1">
+      <InputLinks>
+        <InputLink InputTitle="Input">GVL_Components.fbMachine.stOEE_Analytics.nState @ localhost: DefaultMainTopic/PlcStream1 [1.00ms]</InputLink>
+      </InputLinks>
+      <Parameters>
+        <Parameter Title="Persistent Results">TRUE</Parameter>
+        <Parameter Title="Operator Level On">Equals</Parameter>
+        <Parameter Title="Threshold LevelOn">9</Parameter>
+        <Parameter Title="Tolerance">0</Parameter>
+        <Parameter Title="Negate Input">FALSE</Parameter>
+        <Parameter Title="Negate Enable Execution">FALSE</Parameter>
+        <Parameter Title="Negate Reset">FALSE</Parameter>
+      </Parameters>
+      <Outputs>
+        <Output Title="New Result">0</Output>
+        <Output Title="Is On">False</Output>
+        <Output Title="Current Interval">00:00:38:049</Output>
+        <Output Title="On Total">00:00:00:000</Output>
+        <Output Title="Off Total">00:00:38:049</Output>
+        <Output Title="Count On">0</Output>
+      </Outputs>
+    </Function>
+    <Function Title="State_Stopped" Name="CTcAlyTimingAnalysis_1Ch_Instance2">
+      <InputLinks>
+        <InputLink InputTitle="Input">GVL_Components.fbMachine.stOEE_Analytics.nState @ localhost: DefaultMainTopic/PlcStream1 [1.00ms]</InputLink>
+      </InputLinks>
+      <Parameters>
+        <Parameter Title="Persistent Results">TRUE</Parameter>
+        <Parameter Title="Operator Level On">Equals</Parameter>
+        <Parameter Title="Threshold LevelOn">2</Parameter>
+        <Parameter Title="Tolerance">0</Parameter>
+        <Parameter Title="Negate Input">FALSE</Parameter>
+        <Parameter Title="Negate Enable Execution">FALSE</Parameter>
+        <Parameter Title="Negate Reset">FALSE</Parameter>
+      </Parameters>
+      <Outputs>
+        <Output Title="New Result">0</Output>
+        <Output Title="Is On">False</Output>
+        <Output Title="Current Interval">00:00:38:049</Output>
+        <Output Title="On Total">00:00:00:000</Output>
+        <Output Title="Off Total">00:00:38:049</Output>
+        <Output Title="Count On">0</Output>
+      </Outputs>
+    </Function>
+    <Function Title="Time_Scheduled" Name="CTcAlyTimespanOperation">
+      <InputLinks>
+        <InputLink InputTitle="Input 00">On Total @ State_Execute</InputLink>
+        <InputLink InputTitle="Input 01">On Total @ State_Aborted</InputLink>
+        <InputLink InputTitle="Input 02">On Total @ State_Stopped</InputLink>
+      </InputLinks>
+      <Parameters>
+        <Parameter Title="Num Channels">3</Parameter>
+        <Parameter Title="Timespan Operator">Addition</Parameter>
+        <Parameter Title="Negate Enable Execution">FALSE</Parameter>
+        <Parameter Title="Negate Reset">FALSE</Parameter>
+      </Parameters>
+      <Outputs>
+        <Output Title="New Result">0</Output>
+        <Output Title="Result">00:00:38:048</Output>
+      </Outputs>
+    </Function>
+    <Function Title="Overall Equipment Effectiveness (OEE)" Name="CTcAlyOverallEquipmentEffectiveness">
+      <InputLinks>
+        <InputLink InputTitle="Scheduled Time">Result @ Time_Scheduled</InputLink>
+        <InputLink InputTitle="Operating Time">On Total @ State_Execute</InputLink>
+        <InputLink InputTitle="Units Produced">GVL_Components.fbMachine.stOEE_Analytics.nUnitsProduced @ localhost: DefaultMainTopic/PlcStream1 [1.00ms]</InputLink>
+        <InputLink InputTitle="Defective Units">GVL_Components.fbMachine.stOEE_Analytics.nDefectiveUnits @ localhost: DefaultMainTopic/PlcStream1 [1.00ms]</InputLink>
+      </InputLinks>
+      <Parameters>
+        <Parameter Title="Ideal Cycle Time">1000000000</Parameter>
+        <Parameter Title="Level OK / Warning">90</Parameter>
+        <Parameter Title="Level Warning / Alarm">75</Parameter>
+        <Parameter Title="Negate Enable Execution">FALSE</Parameter>
+        <Parameter Title="Negate Reset">FALSE</Parameter>
+      </Parameters>
+      <Outputs>
+        <Output Title="New Result">0</Output>
+        <Output Title="OEE [%]">2368.1</Output>
+        <Output Title="OEE Class">1</Output>
+        <Output Title="OEE Event Warning">9/5/2024 5:03:46.726 PM</Output>
+        <Output Title="OEE Event Alarm">No event occured</Output>
+        <Output Title="Availability [%]">100</Output>
+        <Output Title="Performance [%]">2368.1</Output>
+        <Output Title="Quality [%]">100</Output>
+      </Outputs>
+    </Function>
+    <Function Title="Continuous Piece Counter 1Ch" Name="CTcAlyContinuousPieceCounter_1Ch">
+      <InputLinks>
+        <InputLink InputTitle="Input">GVL_Components.fbMachine.stOEE_Analytics.nUnitsProduced @ localhost: DefaultMainTopic/PlcStream1 [1.00ms]</InputLink>
+      </InputLinks>
+      <Parameters>
+        <Parameter Title="Persistent Results">FALSE</Parameter>
+        <Parameter Title="Operator Edge">GreaterThanOrEqualTo</Parameter>
+        <Parameter Title="Threshold Edge">1</Parameter>
+        <Parameter Title="Interval">60000000000</Parameter>
+        <Parameter Title="Tolerance">0</Parameter>
+        <Parameter Title="Negate Input">FALSE</Parameter>
+        <Parameter Title="Negate Enable Execution">FALSE</Parameter>
+        <Parameter Title="Negate Reset">FALSE</Parameter>
+      </Parameters>
+      <Outputs>
+        <Output Title="New Result">FALSE</Output>
+        <Output Title="Num Intervals">38</Output>
+        <Output Title="Count Last Interval">0</Output>
+        <Output Title="Count Current Interval">0</Output>
+        <Output Title="Count Min">0</Output>
+        <Output Title="Count Max">0</Output>
+        <Output Title="Time Count Min">9/5/2024 5:04:23.723 PM</Output>
+        <Output Title="Time Count Max">9/5/2024 5:04:23.723 PM</Output>
+        <Output Title="Current Interval Time">00:00:00:049</Output>
+      </Outputs>
+    </Function>
+  </Functions>
+  <InputSources>
+    <InputSource Title="localhost: DefaultMainTopic/PlcStream1 [1.00ms]" Target="&lt;TargetInfo TargetId=&quot;0&quot;&gt;&#xD;&#xA;  &lt;MQTTAddress&gt;&#xD;&#xA;    &lt;ConnectionSettings xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;&#xD;&#xA;      &lt;Broker&gt;localhost&lt;/Broker&gt;&#xD;&#xA;      &lt;BrokerPort&gt;1883&lt;/BrokerPort&gt;&#xD;&#xA;      &lt;UserID /&gt;&#xD;&#xA;      &lt;PasswordCrypted /&gt;&#xD;&#xA;      &lt;WithCertificates&gt;false&lt;/WithCertificates&gt;&#xD;&#xA;      &lt;CA_Certificate /&gt;&#xD;&#xA;      &lt;Cert_Certificate /&gt;&#xD;&#xA;      &lt;Key_Certificate /&gt;&#xD;&#xA;      &lt;CommunicationTimeout&gt;30000000&lt;/CommunicationTimeout&gt;&#xD;&#xA;      &lt;KeepAlivePeriod&gt;600000000&lt;/KeepAlivePeriod&gt;&#xD;&#xA;      &lt;TcpBufferSize&gt;32768&lt;/TcpBufferSize&gt;&#xD;&#xA;    &lt;/ConnectionSettings&gt;&#xD;&#xA;    &lt;Topic&gt;DefaultMainTopic/PlcStream1&lt;/Topic&gt;&#xD;&#xA;    &lt;CycleTime&gt;10000&lt;/CycleTime&gt;&#xD;&#xA;    &lt;SystemID&gt;00436273-58A1-A0EC-E33C-07029F4F38F0&lt;/SystemID&gt;&#xD;&#xA;  &lt;/MQTTAddress&gt;&#xD;&#xA;&lt;/TargetInfo&gt;">
+      <Inputs>
+        <Input Title="TimeLine" VariableInfo="&lt;Symbol&gt;&lt;Name&gt;TimeLine&lt;/Name&gt;&lt;BitSize&gt;64&lt;/BitSize&gt;&lt;BaseType&gt;ULINT&lt;/BaseType&gt;&lt;BitOffset&gt;-1&lt;/BitOffset&gt;&lt;/Symbol&gt;" />
+        <Input Title="GVL_Components.fbMachine.stOEE_Analytics.nState" VariableInfo="&lt;Symbol TargetId=&quot;0&quot;&gt;&#xA;  &lt;Name&gt;GVL_Components.fbMachine.stOEE_Analytics.nState&lt;/Name&gt;&#xA;  &lt;BaseType&gt;UINT&lt;/BaseType&gt;&#xA;  &lt;BitSize&gt;16&lt;/BitSize&gt;&#xA;  &lt;Comment /&gt;&#xA;  &lt;Properties /&gt;&#xA;  &lt;BitOffset&gt;128&lt;/BitOffset&gt;&#xA;&lt;/Symbol&gt;" />
+        <Input Title="GVL_Components.fbMachine.stOEE_Analytics.nUnitsProduced" VariableInfo="&lt;Symbol TargetId=&quot;0&quot;&gt;&#xA;  &lt;Name&gt;GVL_Components.fbMachine.stOEE_Analytics.nUnitsProduced&lt;/Name&gt;&#xA;  &lt;BaseType&gt;ULINT&lt;/BaseType&gt;&#xA;  &lt;BitSize&gt;64&lt;/BitSize&gt;&#xA;  &lt;Comment /&gt;&#xA;  &lt;Properties /&gt;&#xA;  &lt;BitOffset&gt;0&lt;/BitOffset&gt;&#xA;&lt;/Symbol&gt;" />
+        <Input Title="GVL_Components.fbMachine.stOEE_Analytics.nDefectiveUnits" VariableInfo="&lt;Symbol TargetId=&quot;0&quot;&gt;&#xA;  &lt;Name&gt;GVL_Components.fbMachine.stOEE_Analytics.nDefectiveUnits&lt;/Name&gt;&#xA;  &lt;BaseType&gt;ULINT&lt;/BaseType&gt;&#xA;  &lt;BitSize&gt;64&lt;/BitSize&gt;&#xA;  &lt;Comment /&gt;&#xA;  &lt;Properties /&gt;&#xA;  &lt;BitOffset&gt;64&lt;/BitOffset&gt;&#xA;&lt;/Symbol&gt;" />
+      </Inputs>
+    </InputSource>
+  </InputSources>
+</AnalyticsProjectResult>

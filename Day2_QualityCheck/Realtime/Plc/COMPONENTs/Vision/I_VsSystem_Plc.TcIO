@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.13">
+  <Itf Name="I_VsSystem_Plc" Id="{a7ae497e-8b7b-4f7d-b5bc-feaaf1f5801b}">
+    <Declaration><![CDATA[INTERFACE I_VsSystem_Plc
+]]></Declaration>
+    <Method Name="Initialize" Id="{a01fa97e-814f-4f51-b1b3-541f0cccdbe7}">
+      <Declaration><![CDATA[METHOD Initialize : HRESULT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Initialized" Id="{679a4509-bc1e-4115-af25-43b6b7d22297}">
+      <Declaration><![CDATA[PROPERTY Initialized : BOOL]]></Declaration>
+      <Get Name="Get" Id="{c39fa34b-7865-4990-bf7c-cd27b9c23057}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Update" Id="{2b1845f3-684d-400c-83aa-5245bdfa3ac0}">
+      <Declaration><![CDATA[METHOD Update : HRESULT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="UpdateSlow" Id="{21df9aff-7fd5-4d5f-b749-5bcd66e84f41}">
+      <Declaration><![CDATA[METHOD UpdateSlow : HRESULT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

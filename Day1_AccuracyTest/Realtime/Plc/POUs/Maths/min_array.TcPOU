@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="min_array" Id="{18d92879-ad6c-4aa9-bffe-8a1a8e3732b8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION min_array : LREAL
+VAR_IN_OUT
+	aData : ARRAY[*] OF LREAL;
+END_VAR
+VAR
+	nIdx: DINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[min_array := 1.7976931348623158E+308;
+FOR nIdx := LOWER_BOUND(aData,1) TO UPPER_BOUND(aData,1) DO
+	min_array := MIN(aData[nIdx],min_array);
+END_FOR]]></ST>
+    </Implementation>
+    <LineIds Name="min_array">
+      <LineId Id="35" Count="2" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

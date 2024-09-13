@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="FB_N2_M1_BatchNShift1Ch" Id="3a09435c-801d-4347-bf42-8cec2ffaf2d3" SpecialFunc="None">
+    <Declaration><![CDATA[//The BatchNShift 1Ch buffers input values with the configured buffer size and buffer mode.
+FUNCTION_BLOCK FB_N2_M1_BatchNShift1Ch
+VAR_INPUT
+	nDataIn: ULINT; 
+	bEnableExecution: BOOL := TRUE; 
+	bReset: BOOL; 
+	bReconfigure: BOOL := TRUE;
+END_VAR
+VAR_INPUT PERSISTENT
+	eSampleMode: E_ALY_SampleMode; 
+END_VAR
+VAR_OUTPUT
+	bError: BOOL;
+	ipTcResult: I_TcMessage;
+	bNewResult: BOOL;
+	aOutputValues: ARRAY [0..2] OF LREAL;
+END_VAR
+VAR
+	
+	R_TRIG_Reconfigure: R_TRIG;
+	
+	fbALY_BatchNShift_1Ch: FB_ALY_BatchNShift_1Ch(nBufferSize:=3);
+END_VAR
+VAR PERSISTENT
+	bConfigured: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Call" Id="dcaa2df5-98cc-4af3-a919-7265999c2df9">
+      <Declaration><![CDATA[METHOD Call : BOOL
+VAR_INPUT
+	nCurrentContext: DWORD;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bConfigured THEN
+	bConfigured:= TRUE;
+
+	eSampleMode:= E_ALY_SampleMode.Flow;
+
+END_IF
+
+R_TRIG_Reconfigure(CLK:= bReconfigure);
+IF R_TRIG_Reconfigure.Q THEN
+	fbALY_BatchNShift_1Ch.Configure(eSampleMode:= eSampleMode);
+
+	bReconfigure:= FALSE;
+END_IF
+
+IF bReset THEN
+	Reset();
+END_IF
+
+IF bEnableExecution THEN
+	IF F_HasContext(nCurrentContext, nContext) THEN
+		fbALY_BatchNShift_1Ch.SetChannelValue(Input:= nDataIn);
+
+		fbALY_BatchNShift_1Ch.Call();
+
+		bNewResult:= fbALY_BatchNShift_1Ch.bNewResult;
+
+		fbALY_BatchNShift_1Ch.GetOutputArray(pArrayOut:= ADR(aOutputValues), nArrayOutSize:= SIZEOF(aOutputValues));
+
+		bError:= fbALY_BatchNShift_1Ch.bError;
+		ipTcResult:= fbALY_BatchNShift_1Ch.ipResultMessage;
+	END_IF
+ELSE
+	bNewResult:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="1cb8efc6-abfe-43a9-bcfa-76f31460f684">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Reset:= fbALY_BatchNShift_1Ch.Reset();
+
+bNewResult:= fbALY_BatchNShift_1Ch.bNewResult;
+
+fbALY_BatchNShift_1Ch.GetOutputArray(pArrayOut:= ADR(aOutputValues), nArrayOutSize:= SIZEOF(aOutputValues));
+
+bError:= NOT Reset;
+ipTcResult:= fbALY_BatchNShift_1Ch.ipResultMessage;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="nContext" Id="55a67a3f-6cc3-4128-8e62-983cd84f391a">
+      <Declaration><![CDATA[PROPERTY nContext : DWORD]]></Declaration>
+      <Get Name="Get" Id="990f2726-3e17-4a8a-8f2e-9145fa6d0666">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nContext:= E_VirtualInput.eContext_V1_Virtual_Input_Source;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

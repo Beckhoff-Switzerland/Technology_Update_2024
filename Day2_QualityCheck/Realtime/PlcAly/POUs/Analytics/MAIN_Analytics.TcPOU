@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Productversion="">
+  <POU Name="MAIN_Analytics" Id="9301560c-62e2-4528-b765-760bb1275fa4" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN_Analytics
+VAR
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+//Reset Analytics Components
+A_Reset();
+
+CASE AnalyticsHMI.stHMI_DataSourceCtrl.nActiveConfigurationIdx OF
+	0:
+
+		//Reset
+		MAIN_Analytics_C1.A_Reset(stReset := Analytics.stReset);
+
+		//Map to HMI
+		MAIN_Analytics_C1.A_MapToHMI();
+END_CASE
+
+
+//Call DataSource FBs
+IF Analytics.fbT1_InputSource.bReadNewData THEN
+	Analytics.fbT1_InputSource.Call();
+END_IF]]></ST>
+    </Implementation>
+    <Action Name="A_Reset" Id="32f979e0-fd6a-4290-9c7b-e81eb6359efa">
+      <Implementation>
+        <ST><![CDATA[
+IF AnalyticsHMI.bN1_OEEDashboard_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_OEEDashboard;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_OEEDashboard_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M1_State_Unit_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M1_State_Unit;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M1_State_Unit_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M2_State_Execute_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M2_State_Execute;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M2_State_Execute_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M3_State_Aborted_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M3_State_Aborted;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M3_State_Aborted_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M4_State_Stopped_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M4_State_Stopped;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M4_State_Stopped_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M5_Time_Scheduled_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M5_Time_Scheduled;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M5_Time_Scheduled_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M6_OverallEquipmentEffectivenessOEE_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M6_OverallEquipmentEffectivenessOEE;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M6_OverallEquipmentEffectivenessOEE_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN1_M7_MachineLearningCalculationDuration_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N1_M7_MachineLearningCalculationDuration;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN1_M7_MachineLearningCalculationDuration_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN2_Products_Produced_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N2_Products_Produced;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN2_Products_Produced_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN2_M1_BatchNShift1Ch_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N2_M1_BatchNShift1Ch;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN2_M1_BatchNShift1Ch_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN2_M2_MathOperation_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N2_M2_MathOperation;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN2_M2_MathOperation_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN2_M3_EdgeCounter1Ch_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N2_M3_EdgeCounter1Ch;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN2_M3_EdgeCounter1Ch_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN3_Products_Defective_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N3_Products_Defective;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN3_Products_Defective_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN3_M1_BatchNShift1Ch_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N3_M1_BatchNShift1Ch;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN3_M1_BatchNShift1Ch_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN3_M2_MathOperation_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N3_M2_MathOperation;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN3_M2_MathOperation_Reset:= FALSE;
+END_IF
+
+IF AnalyticsHMI.bN3_M3_EdgeCounter1Ch_Reset THEN
+	Analytics.stReset.eResetComponent:= E_AnalysisComponents.N3_M3_EdgeCounter1Ch;
+	Analytics.stReset.bResetExecute:= TRUE;
+	AnalyticsHMI.bN3_M3_EdgeCounter1Ch_Reset:= FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Action>
+  </POU>
+</TcPlcObject>

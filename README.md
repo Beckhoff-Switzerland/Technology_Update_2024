@@ -23,6 +23,10 @@ cd Technology_Update_2024
 # Open the TwinCAT solution in the respective folder
 ```
 
+## Library dependencies 
+- TwinCAT Vision 4.0.6.0 Beta
+- CHALET Vision 3.0.1
+
 ## License
 
 This project is licensed under the BSD Zero Clause License (0BSD). For more details, see the [LICENSE.md](LICENSE.md) file in the repository.

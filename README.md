@@ -23,9 +23,18 @@ cd Technology_Update_2024
 # Open the TwinCAT solution in the respective folder
 ```
 
-## Library dependencies 
+## Project dependencies  
+- TwinCAT 3.1.4024.59
+- TwinCAT Xplanar 4.1.13.0
+- TwinCAT Advanced Motion Pack 3.3.25.0
+- TwinCAT Measurement 3.4.3148.30
+- TwinCAT HMI 1.12.762.42
 - TwinCAT Vision 4.0.6.0 Beta
 - CHALET Vision 3.0.1
+- CHALET XLANAR ????
+- CHALET XTS ????
+- Mosquitto 2.0.18a
+
 
 ## License
 
